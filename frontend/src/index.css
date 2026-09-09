@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-size: 18px; /* Enlarges base REM scaling across the entire web portal */
+  }
+  body {
+    background-color: #F8FAFC;
+    color: #081F5C;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  input, select, textarea, button {
+    font-size: 0.95rem;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F0F5FF;
+}
+::-webkit-scrollbar-thumb {
+  background: #D0E3FF;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #081F5C;
+}
