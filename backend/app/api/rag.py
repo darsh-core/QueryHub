@@ -14,7 +14,8 @@ def build_file_url(file_path_or_name: str) -> str:
     """Build URL-safe static file URL without double-encoding."""
     base_name = os.path.basename(file_path_or_name)
     raw_name = unquote(base_name)
-    return f"http://localhost:8000/uploads/{quote(raw_name)}"
+    base_url = os.getenv("BACKEND_URL", "https://queryhub-qge3.onrender.com").rstrip("/")
+    return f"{base_url}/uploads/{quote(raw_name)}"
 
 def enrich_slides_with_images(slides: list, file_path: str) -> list:
     """Ensure slide objects contain exact visual image_url pointing to slide-XX.png files."""
@@ -25,6 +26,7 @@ def enrich_slides_with_images(slides: list, file_path: str) -> list:
     base_no_ext = os.path.splitext(filename)[0]
     slides_dir_name = f"slides_{base_no_ext}"
     slides_dir = os.path.join(settings.UPLOAD_DIR, slides_dir_name)
+    base_url = os.getenv("BACKEND_URL", "https://queryhub-qge3.onrender.com").rstrip("/")
     
     if os.path.exists(slides_dir):
         image_files = sorted(glob.glob(os.path.join(slides_dir, "slide-*.png")))
@@ -38,7 +40,7 @@ def enrich_slides_with_images(slides: list, file_path: str) -> list:
             for idx, s in enumerate(slides):
                 if idx < len(image_files):
                     f_name = os.path.basename(image_files[idx])
-                    s["image_url"] = f"http://localhost:8000/uploads/{quote(slides_dir_name)}/{quote(f_name)}"
+                    s["image_url"] = f"{base_url}/uploads/{quote(slides_dir_name)}/{quote(f_name)}"
     return slides or []
 
 router = APIRouter(prefix="/rag", tags=["RAG Services"])

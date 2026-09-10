@@ -5,6 +5,7 @@ import {
   Maximize2, Minimize2, Sidebar, Table as TableIcon, BookOpen, CheckCircle2,
   Image as ImageIcon
 } from 'lucide-react';
+import { resolveBackendUrl } from '../../services/api';
 
 export const GoogleClassroomViewerModal = ({ 
   isOpen, 
@@ -23,6 +24,9 @@ export const GoogleClassroomViewerModal = ({
   const [showThumbnails, setShowThumbnails] = useState(true);
   const [viewMode, setViewMode] = useState('slide'); // 'slide' | 'text' | 'pdf'
 
+  const resolvedFileUrl = resolveBackendUrl(fileUrl);
+  const resolvedPdfUrl = resolveBackendUrl(pdfUrl);
+
   const isPDF = rawFileType === 'PDF' || 
     (fileUrl && fileUrl.toLowerCase().endsWith('.pdf')) || 
     (documentTitle && documentTitle.toLowerCase().endsWith('.pdf'));
@@ -39,7 +43,7 @@ export const GoogleClassroomViewerModal = ({
   const activeSlide = slides.length > 0 ? slides[activeSlideIndex] : null;
 
   // Effective PDF url (for PDFs or converted PPTX)
-  const effectivePdfUrl = isPDF ? (fileUrl || pdfUrl) : (pdfUrl || activeSlide?.pdf_url || null);
+  const effectivePdfUrl = isPDF ? (resolvedFileUrl || resolvedPdfUrl) : (resolvedPdfUrl || resolveBackendUrl(activeSlide?.pdf_url) || null);
 
   // Reset page and mode whenever document changes or opens
   useEffect(() => {
@@ -345,10 +349,13 @@ export const GoogleClassroomViewerModal = ({
                   {s.image_url ? (
                     <div className="w-full aspect-[16/9] bg-black rounded-lg overflow-hidden border border-gray-700/60 mb-1.5 relative shadow-xs">
                       <img 
-                        src={s.image_url} 
+                        src={resolveBackendUrl(s.image_url)} 
                         alt={`Slide ${slideNum}`} 
                         className="w-full h-full object-contain bg-[#111]"
                         loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                       <div className="absolute top-1 left-1 bg-black/75 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold text-white">
                         {slideNum}
@@ -428,8 +435,9 @@ export const GoogleClassroomViewerModal = ({
                 className="transition-transform duration-150 relative max-w-5xl w-full flex items-center justify-center shadow-2xl rounded-xl overflow-hidden border border-[#333] bg-[#0c0c0d]"
               >
                 <img 
-                  src={activeSlide.image_url} 
+                  src={resolveBackendUrl(activeSlide.image_url)} 
                   alt={currentSlideTitle}
+                  onError={() => setViewMode('text')}
                   className="max-h-[75vh] w-auto max-w-full object-contain select-none block rounded-lg"
                 />
               </div>

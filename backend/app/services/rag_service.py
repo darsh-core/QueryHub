@@ -154,6 +154,7 @@ class RAGService:
 
         # 2. Extract high-res PNG images for every slide
         slide_image_urls = []
+        base_url = os.getenv("BACKEND_URL", "https://queryhub-qge3.onrender.com").rstrip("/")
         if os.path.exists(pdf_path):
             try:
                 os.makedirs(slides_dir, exist_ok=True)
@@ -163,14 +164,14 @@ class RAGService:
                 png_files = sorted(glob.glob(os.path.join(slides_dir, "slide-*.png")))
                 for f in png_files:
                     f_name = os.path.basename(f)
-                    slide_image_urls.append(f"http://localhost:8000/uploads/{quote(slides_dir_name)}/{quote(f_name)}")
+                    slide_image_urls.append(f"{base_url}/uploads/{quote(slides_dir_name)}/{quote(f_name)}")
             except Exception as e:
                 print(f"Error extracting slide images: {e}")
 
         has_pdf = os.path.exists(pdf_path)
         return {
             "pdf_name": pdf_name if has_pdf else None,
-            "pdf_url": f"http://localhost:8000/uploads/{quote(pdf_name)}" if has_pdf else None,
+            "pdf_url": f"{base_url}/uploads/{quote(pdf_name)}" if has_pdf else None,
             "slide_images": slide_image_urls
         }
 
@@ -188,6 +189,7 @@ class RAGService:
         os.makedirs(slides_dir, exist_ok=True)
 
         slide_image_urls = []
+        base_url = os.getenv("BACKEND_URL", "https://queryhub-qge3.onrender.com").rstrip("/")
         try:
             pdftoppm_bin = "/opt/homebrew/bin/pdftoppm" if os.path.exists("/opt/homebrew/bin/pdftoppm") else "pdftoppm"
             subprocess.run([pdftoppm_bin, "-png", "-r", "150", pdf_path, os.path.join(slides_dir, "slide")], capture_output=True, timeout=60)
@@ -195,7 +197,7 @@ class RAGService:
             png_files = sorted(glob.glob(os.path.join(slides_dir, "slide-*.png")))
             for f in png_files:
                 f_name = os.path.basename(f)
-                slide_image_urls.append(f"http://localhost:8000/uploads/{quote(slides_dir_name)}/{quote(f_name)}")
+                slide_image_urls.append(f"{base_url}/uploads/{quote(slides_dir_name)}/{quote(f_name)}")
         except Exception as e:
             print(f"Error extracting PDF page images: {e}")
 

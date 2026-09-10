@@ -5,6 +5,20 @@ if (!rawApiUrl || rawApiUrl.includes('queryhub-backend.onrender.com') || rawApiU
   rawApiUrl = 'https://queryhub-qge3.onrender.com/api';
 }
 const API_BASE_URL = rawApiUrl.replace(/\/+$/, '');
+export const BACKEND_ROOT_URL = API_BASE_URL.replace(/\/api\/?$/, '');
+
+export const resolveBackendUrl = (pathOrUrl) => {
+  if (!pathOrUrl) return '';
+  if (typeof pathOrUrl !== 'string') return pathOrUrl;
+  if (pathOrUrl.startsWith('http://localhost:8000')) {
+    return pathOrUrl.replace('http://localhost:8000', BACKEND_ROOT_URL);
+  }
+  if (pathOrUrl.startsWith('/uploads/') || pathOrUrl.startsWith('uploads/')) {
+    const cleanPath = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
+    return `${BACKEND_ROOT_URL}${cleanPath}`;
+  }
+  return pathOrUrl;
+};
 
 const api = axios.create({
   baseURL: API_BASE_URL,
