@@ -4,10 +4,29 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 60000, // 60s timeout for Render free tier cold starts
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Automatic retry interceptor for Render free-tier spin up delays
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const { config } = error;
+    if (!config || config.__isRetry) {
+      return Promise.reject(error);
+    }
+    // Retry up to 2 times if server is waking up
+    if (!error.response || error.code === 'ECONNABORTED' || error.message.includes('Network Error')) {
+      config.__isRetry = true;
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+      return api(config);
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const authApi = {
   login: (email, password) => api.post('/auth/login', { email, password }),
