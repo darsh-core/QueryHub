@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://queryhub-qge3.onrender.com/api';
+let rawApiUrl = import.meta.env.VITE_API_URL || '';
+if (!rawApiUrl || rawApiUrl.includes('queryhub-backend.onrender.com') || rawApiUrl.includes('your-queryhub')) {
+  rawApiUrl = 'https://queryhub-qge3.onrender.com/api';
+}
+const API_BASE_URL = rawApiUrl.replace(/\/+$/, '');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
