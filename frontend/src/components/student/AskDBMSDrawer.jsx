@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ragApi } from '../../services/api';
+import { FormattedAIResponse } from '../common/FormattedAIResponse';
 import { 
   Bot, Send, X, Sparkles, BookOpen, ExternalLink, 
   CheckCircle2, RefreshCw, FileText 
@@ -90,7 +91,7 @@ export const AskDBMSDrawer = ({ isOpen, onClose, moduleId = null, moduleTitle = 
                   ? 'bg-lms-dark text-white rounded-br-none' 
                   : 'bg-white text-lms-dark border border-lms-border rounded-bl-none'
               }`}>
-                <p className="whitespace-pre-wrap leading-relaxed">{m.text}</p>
+                <FormattedAIResponse content={m.text} />
 
                 {/* Source Citations Pill Badges */}
                 {m.citations && m.citations.length > 0 && (

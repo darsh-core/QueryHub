@@ -3,6 +3,7 @@ import { modulesApi, ragApi } from '../../services/api';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
+import { FormattedAIResponse } from '../common/FormattedAIResponse';
 import { FileText, Sparkles, Copy, Check, Search, Bot, MessageSquare, Send, X, BookOpen } from 'lucide-react';
 
 export const CourseNotesViewer = () => {
@@ -188,7 +189,7 @@ export const CourseNotesViewer = () => {
                     : 'bg-lms-surface text-lms-dark border border-lms-border mr-auto'
                 }`}
               >
-                <p>{msg.text}</p>
+                <FormattedAIResponse content={msg.text} />
                 {msg.context && (
                   <details className="mt-2 text-[10px] text-lms-taupe border-t border-lms-border pt-1">
                     <summary className="cursor-pointer font-bold">View Grounded Vector Source Context</summary>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ragApi, modulesApi, quizApi } from '../../services/api';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
+import { FormattedAIResponse } from '../common/FormattedAIResponse';
 import { CheckSquare, Sparkles, Send, Bot, Layers, Award } from 'lucide-react';
 
 export const QuickAnalyticsWidget = () => {
@@ -92,7 +93,7 @@ export const QuickAnalyticsWidget = () => {
               <div className="flex items-center gap-2 text-xs font-bold text-lms-dark">
                 <Bot className="w-4 h-4 text-lms-sand" /> Qwen 3.2 AI Grounded Response:
               </div>
-              <p className="text-xs text-lms-dark whitespace-pre-line leading-relaxed">{aiAnswer}</p>
+              <FormattedAIResponse content={aiAnswer} />
             </div>
           )}
         </form>
