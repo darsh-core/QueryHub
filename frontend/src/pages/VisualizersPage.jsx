@@ -27,7 +27,7 @@ export const VisualizersPage = () => {
           </button>
 
           <span className="text-xs font-mono font-bold text-edwin-midnight bg-edwin-dawn/40 px-3 py-1 rounded-xl border border-edwin-border">
-            Edwin Visualizer Suite v2.0
+            Qwen Visualizer Suite v2.0
           </span>
         </div>
 
@@ -42,7 +42,7 @@ export const VisualizersPage = () => {
           </h1>
 
           <p className="text-xs sm:text-sm text-edwin-navy leading-relaxed max-w-3xl">
-            Inspired by Edwin Visualizers. Test B+ Tree index insertions, SQL Join tuple matching, BCNF decomposition, and 2-Phase Locking (2PL) concurrency step-by-step.
+            Powered by Qwen Visualizers. Test B+ Tree index insertions, SQL Join tuple matching, BCNF decomposition, and 2-Phase Locking (2PL) concurrency step-by-step.
           </p>
         </div>
 

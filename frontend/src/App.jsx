@@ -73,7 +73,7 @@ export default function App() {
             </ProtectedRoute>
           } />
 
-          {/* Edwin Interactive Visualizer Suite */}
+          {/* Qwen Interactive Visualizer Suite */}
           <Route path="/visualizers" element={
             <ProtectedRoute>
               <VisualizersPage />
