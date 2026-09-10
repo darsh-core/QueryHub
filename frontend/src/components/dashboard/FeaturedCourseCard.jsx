@@ -60,20 +60,26 @@ export const FeaturedCourseCard = () => {
           <div>
             <div className="flex justify-between text-[11px] font-bold text-lms-taupe mb-1">
               <span>Course Completion</span>
-              <span className="text-lms-dark">60%</span>
+              <span className="text-lms-dark font-extrabold">0%</span>
             </div>
             <div className="w-full h-2 bg-lms-bg rounded-full overflow-hidden border border-lms-border/40">
-              <div className="h-full bg-lms-sand rounded-full w-3/5 transition-all duration-500"></div>
+              <div className="h-full bg-lms-sand rounded-full w-0 transition-all duration-500"></div>
             </div>
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            <span className="text-xs font-bold text-emerald-800 flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 3 Modules Completed
+            <span className="text-xs font-bold text-slate-500 flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-slate-400" /> 0 Modules Completed
             </span>
-            <span className="text-xs font-bold text-lms-dark group-hover:translate-x-1 transition-transform flex items-center gap-1">
-              Open Course <ArrowRight className="w-4 h-4 text-lms-sand" />
-            </span>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/course/dbms');
+              }}
+              className="bg-[#081F5C] hover:bg-blue-950 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5 group-hover:scale-105"
+            >
+              Start Learning <ArrowRight className="w-4 h-4 text-lms-sand" />
+            </button>
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ export const AskDBMSDrawer = ({ isOpen, onClose, moduleId = null, moduleTitle = 
   const [messages, setMessages] = useState([
     {
       sender: 'assistant',
-      text: `Hello! I am your Ask DBMS AI Assistant powered by Qwen 2.5 7B RAG. Ask me any question about database architecture, SQL, functional dependencies, normalization, transactions, or indexing!`,
+      text: `Hello! I am QueryHub AI, powered by Qwen 2.5 7B RAG. Ask me any question about database architecture, SQL queries, functional dependencies, normalization, transactions, or B+ tree indexing!`,
       citations: []
     }
   ]);
@@ -43,7 +43,7 @@ export const AskDBMSDrawer = ({ isOpen, onClose, moduleId = null, moduleTitle = 
         ...prev,
         {
           sender: 'assistant',
-          text: "I am currently unable to retrieve RAG chunks. Please ensure backend services are active.",
+          text: "I am currently unable to connect to QueryHub AI. Please ensure backend services are active.",
           citations: []
         }
       ]);
@@ -64,7 +64,7 @@ export const AskDBMSDrawer = ({ isOpen, onClose, moduleId = null, moduleTitle = 
             </div>
             <div>
               <h3 className="text-sm font-black text-white flex items-center gap-1.5">
-                Ask DBMS AI Assistant <Sparkles className="w-3.5 h-3.5 text-lms-sand" />
+                QueryHub AI <Sparkles className="w-3.5 h-3.5 text-lms-sand" />
               </h3>
               <p className="text-[10px] text-lms-sand font-mono">Qwen 2.5 7B • RAG Grounded Citations</p>
             </div>
@@ -118,7 +118,7 @@ export const AskDBMSDrawer = ({ isOpen, onClose, moduleId = null, moduleTitle = 
           {loading && (
             <div className="flex items-center gap-2 p-3 bg-white border border-lms-border rounded-2xl max-w-xs text-xs font-bold text-lms-taupe animate-pulse">
               <RefreshCw className="w-4 h-4 text-lms-dark animate-spin" />
-              Qwen 2.5 7B scanning DBMS materials...
+              QueryHub AI (Qwen 2.5 7B) thinking...
             </div>
           )}
         </div>
@@ -127,7 +127,7 @@ export const AskDBMSDrawer = ({ isOpen, onClose, moduleId = null, moduleTitle = 
         <form onSubmit={handleAsk} className="p-3 bg-white border-t border-lms-border flex items-center gap-2">
           <input
             type="text"
-            placeholder="Ask Qwen about DBMS architecture, 2PL, normal forms..."
+            placeholder="Ask QueryHub AI about DBMS architecture, 2PL, normal forms..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="flex-1 px-3 py-2 text-xs bg-lms-surface border border-lms-border rounded-xl text-lms-dark placeholder-lms-taupe focus:outline-none focus:ring-2 focus:ring-lms-dark font-medium"

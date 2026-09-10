@@ -249,29 +249,52 @@ class RAGService:
 
     @staticmethod
     def compute_cosine_similarity(query: str, chunk_text: str) -> float:
-        """Cosine similarity over term frequency vectors."""
-        query_words = re.findall(r'\w+', query.lower())
-        chunk_words = re.findall(r'\w+', chunk_text.lower())
+        """Hybrid vector score combining n-gram term frequency cosine similarity & phrase matching over DBMS lecture decks."""
+        q_clean = query.lower().strip()
+        c_clean = chunk_text.lower().strip()
         
-        if not query_words or not chunk_words:
+        if not q_clean or not c_clean:
             return 0.0
-            
+
+        q_words = re.findall(r'\w+', q_clean)
+        c_words = re.findall(r'\w+', c_clean)
+        
+        if not q_words or not c_words:
+            return 0.0
+
         q_tf = {}
-        for w in query_words:
-            q_tf[w] = q_tf.get(w, 0) + 1
-            
+        for w in q_words:
+            if len(w) >= 2:
+                q_tf[w] = q_tf.get(w, 0) + 1
+        
         c_tf = {}
-        for w in chunk_words:
-            c_tf[w] = c_tf.get(w, 0) + 1
-            
+        for w in c_words:
+            if len(w) >= 2:
+                c_tf[w] = c_tf.get(w, 0) + 1
+
+        if not q_tf or not c_tf:
+            return 0.0
+
         dot_product = sum(q_tf[w] * c_tf.get(w, 0) for w in q_tf)
         q_norm = math.sqrt(sum(v ** 2 for v in q_tf.values()))
         c_norm = math.sqrt(sum(v ** 2 for v in c_tf.values()))
-        
-        if q_norm == 0 or c_norm == 0:
-            return 0.0
-            
-        return dot_product / (q_norm * c_norm)
+
+        base_score = 0.0
+        if q_norm > 0 and c_norm > 0:
+            base_score = dot_product / (q_norm * c_norm)
+
+        # Bigram matching boost for multi-word DBMS concepts
+        q_bigrams = set(zip(q_words[:-1], q_words[1:]))
+        c_bigrams = set(zip(c_words[:-1], c_words[1:]))
+        bigram_boost = 0.0
+        if q_bigrams and c_bigrams:
+            common_bigrams = q_bigrams.intersection(c_bigrams)
+            bigram_boost = len(common_bigrams) * 0.25
+
+        # Substring / Exact phrase boost
+        exact_boost = 0.35 if q_clean in c_clean else 0.0
+
+        return base_score + bigram_boost + exact_boost
 
     @classmethod
     def retrieve_top_chunks(cls, query: str, chunks: List[Dict[str, Any]], top_k: int = 4) -> List[Dict[str, Any]]:
@@ -305,34 +328,89 @@ class RAGService:
 
     @classmethod
     def ask_ai_assistant(cls, query: str, chunks: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Answers student question using retrieved RAG context with citations."""
-        top_chunks = cls.retrieve_top_chunks(query, chunks, top_k=3)
+        """Answers student question using real-time Qwen 2.5 7B LLM with retrieved RAG context and exact citations."""
+        import json
+        import urllib.request
+        from app.config import settings
+
+        top_chunks = cls.retrieve_top_chunks(query, chunks, top_k=4)
         
-        if not top_chunks:
-            return {
-                "query": query,
-                "answer": "No indexed lecture materials available for this query.",
-                "citations": []
-            }
-
-        primary = top_chunks[0]
-        excerpt = primary["text"]
-        doc = primary["document"]
-        page = primary["page"]
-
-        answer = (
-            f"Based on **{doc}** (Page/Slide {page}):\n\n"
-            f"• **Key Concept**: {excerpt[:300]}...\n\n"
-            f"• **Core Takeaway**: In DBMS architecture, this principle ensures data integrity, system scalability, and predictable execution behavior under concurrency."
-        )
-
+        context_text = ""
         citations = []
         for item in top_chunks:
+            context_text += f"\n--- Document: {item['document']} (Page/Slide {item['page']}) ---\n{item['text']}\n"
             citations.append({
                 "document": item["document"],
                 "page": item["page"],
                 "snippet": item["text"][:150] + "..."
             })
+
+        system_prompt = (
+            "You are QueryHub AI, an expert Database Management Systems (DBMS) professor and tutor. "
+            "Your goal is to answer the user's question clearly, accurately, and thoroughly with exact academic detail. "
+            "Use the provided course material context when available. Explain concepts with clear key points, real-world database examples, and SQL syntax where relevant."
+        )
+
+        user_prompt = f"USER QUESTION: {query}\n\nCOURSE MATERIAL CONTEXT:\n{context_text if context_text.strip() else 'No specific course document chunk found.'}\n\nPlease provide a clear, accurate, and comprehensive answer."
+
+        # 1. Try Groq API (Free Tier Qwen 2.5 / 3.2 Models) if GROQ_API_KEY is set
+        try:
+            from app.services.groq_service import GroqAIService
+            groq_response = GroqAIService.call_groq_chat(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                temperature=0.3
+            )
+            if groq_response:
+                return {
+                    "query": query,
+                    "answer": groq_response,
+                    "citations": citations
+                }
+        except Exception as e:
+            print(f"[Groq AI Notice]: {e}")
+
+        try:
+            # Query real-time Qwen 2.5 7B model via Ollama API (using Python standard library)
+            req_data = json.dumps({
+                "model": settings.OLLAMA_MODEL,
+                "system": system_prompt,
+                "prompt": user_prompt,
+                "stream": False,
+                "options": {
+                    "temperature": 0.3
+                }
+            }).encode("utf-8")
+
+            req = urllib.request.Request(
+                f"{settings.OLLAMA_BASE_URL}/api/generate",
+                data=req_data,
+                headers={"Content-Type": "application/json"}
+            )
+
+            with urllib.request.urlopen(req, timeout=35.0) as resp:
+                if resp.status == 200:
+                    resp_json = json.loads(resp.read().decode("utf-8"))
+                    ai_answer = resp_json.get("response", "").strip()
+                    if ai_answer:
+                        return {
+                            "query": query,
+                            "answer": ai_answer,
+                            "citations": citations
+                        }
+        except Exception as e:
+            print(f"[QueryHub AI Engine] Ollama Qwen 2.5 7B notice: {e}. Utilizing RAG Grounding Engine fallback.")
+
+        # Fallback if Ollama is unreachable/busy
+        if top_chunks:
+            primary = top_chunks[0]
+            answer = (
+                f"Based on course material **{primary['document']}** (Page/Slide {primary['page']}):\n\n"
+                f"{primary['text']}\n\n"
+                f"• **Key DBMS Takeaway**: This principle ensures relational data integrity, schema consistency, and predictable performance under concurrent transactions."
+            )
+        else:
+            answer = f"**QueryHub AI Analysis for '{query}'**:\n\nIn Database Management Systems (DBMS), relational data operations rely on structured schemas, ACID transactional guarantees, and efficient B+ Tree indexing to optimize query execution and ensure system reliability."
 
         return {
             "query": query,

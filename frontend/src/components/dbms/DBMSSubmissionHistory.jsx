@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { dbmsLabApi } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { 
   CheckCircle, XCircle, AlertTriangle, Clock, Code, Database, 
   Search, Filter, RefreshCw, ChevronRight, Award, Calendar, ArrowLeft
@@ -8,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 const DBMSSubmissionHistory = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,7 +21,7 @@ const DBMSSubmissionHistory = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await dbmsLabApi.getSubmissionHistory(1);
+      const res = await dbmsLabApi.getSubmissionHistory(user?.id || 1);
       setSubmissions(res.data.submissions || res.data || []);
     } catch (err) {
       console.error('Failed to fetch submission history', err);

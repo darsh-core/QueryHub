@@ -294,8 +294,10 @@ def get_challenges(topic: Optional[str] = None, difficulty: Optional[str] = None
             "difficulty": c.difficulty,
             "database_name": c.database_name,
             "starter_sql": c.starter_sql,
+            "reference_sql": c.reference_sql,
             "competency_name": c.competency_name,
             "max_score": c.max_score,
+            "test_cases": tc_parsed,
             "test_cases_count": len(tc_parsed),
             "visible_test_cases": visible_tcs
         })
@@ -406,38 +408,37 @@ def evaluate_submission(req: EvaluateSubmissionRequest, db: Session = Depends(ge
     submission = DBMSSubmission(
         student_id=req.student_id or 1,
         challenge_id=req.challenge_id,
-        submitted_query=req.query_text,
-        status=status_str,
+        query_text=req.query_text,
+        score=points,
+        is_correct=is_accepted,
         execution_time_ms=eval_result["execution_time_ms"],
-        points_earned=points,
-        error_message=eval_result.get("error"),
-        eval_details_json=json.dumps(eval_result)
+        test_results_json=json.dumps(eval_result.get("test_results", []))
     )
     db.add(submission)
 
     # Update Competency Progress
+    subskill = c.competency_name or c.topic
     comp = db.query(DBMSCompetencyProgress).filter(
         DBMSCompetencyProgress.student_id == (req.student_id or 1),
-        DBMSCompetencyProgress.topic == c.topic
+        DBMSCompetencyProgress.subskill_name == subskill
     ).first()
 
     if not comp:
         comp = DBMSCompetencyProgress(
             student_id=req.student_id or 1,
-            topic=c.topic,
-            mastery_score_pct=20.0 if is_accepted else 5.0,
-            challenges_solved=1 if is_accepted else 0,
-            challenges_attempted=1,
-            total_points=points,
-            streak_days=1
+            subskill_name=subskill,
+            mastery_pct=20.0 if is_accepted else 5.0,
+            success_count=1 if is_accepted else 0,
+            attempts_count=1,
+            score=points
         )
         db.add(comp)
     else:
-        comp.challenges_attempted += 1
+        comp.attempts_count += 1
         if is_accepted:
-            comp.challenges_solved += 1
-            comp.total_points += points
-            comp.mastery_score_pct = min(100.0, comp.mastery_score_pct + 15.0)
+            comp.success_count += 1
+            comp.score += points
+            comp.mastery_pct = min(100.0, comp.mastery_pct + 15.0)
 
     db.commit()
 
@@ -535,27 +536,32 @@ def get_trainer_analytics(db: Session = Depends(get_db)):
 
 @router.get("/submissions/history")
 def get_submission_history(student_id: int = 1, db: Session = Depends(get_db)):
-    subs = db.query(DBMSSubmission).filter(DBMSSubmission.student_id == student_id).order_by(DBMSSubmission.created_at.desc()).all()
+    subs = db.query(DBMSSubmission).filter(
+        (DBMSSubmission.student_id == student_id) | (DBMSSubmission.student_id == None)
+    ).order_by(DBMSSubmission.submitted_at.desc()).all()
+    
     result = []
     for s in subs:
         ch = db.query(DBMSChallenge).filter(DBMSChallenge.id == s.challenge_id).first()
-        eval_det = None
+        test_results = None
         try:
-            eval_det = json.loads(s.eval_details_json) if s.eval_details_json else None
+            test_results = json.loads(s.test_results_json) if s.test_results_json else None
         except Exception:
             pass
+
+        status_str = "ACCEPTED" if s.is_correct else "WRONG_ANSWER"
 
         result.append({
             "id": s.id,
             "challenge_id": s.challenge_id,
             "challenge_title": ch.title if ch else f"Challenge #{s.challenge_id}",
-            "submitted_query": s.submitted_query,
-            "status": s.status,
+            "submitted_query": s.query_text,
+            "status": status_str,
             "execution_time_ms": s.execution_time_ms,
-            "points_earned": s.points_earned,
-            "error_message": s.error_message,
-            "eval_details": eval_det,
-            "created_at": s.created_at.isoformat() if s.created_at else ""
+            "points_earned": s.score,
+            "error_message": None if s.is_correct else "Result set does not match reference query.",
+            "eval_details": test_results,
+            "created_at": s.submitted_at.isoformat() if s.submitted_at else ""
         })
     return {"submissions": result}
 
@@ -566,68 +572,92 @@ def get_submission_detail(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Submission not found")
     ch = db.query(DBMSChallenge).filter(DBMSChallenge.id == s.challenge_id).first()
     
-    eval_det = None
+    test_results = None
     try:
-        eval_det = json.loads(s.eval_details_json) if s.eval_details_json else None
+        test_results = json.loads(s.test_results_json) if s.test_results_json else None
     except Exception:
         pass
+
+    status_str = "ACCEPTED" if s.is_correct else "WRONG_ANSWER"
 
     return {
         "id": s.id,
         "challenge_id": s.challenge_id,
         "challenge_title": ch.title if ch else f"Challenge #{s.challenge_id}",
-        "submitted_query": s.submitted_query,
-        "status": s.status,
+        "submitted_query": s.query_text,
+        "status": status_str,
         "execution_time_ms": s.execution_time_ms,
-        "points_earned": s.points_earned,
-        "error_message": s.error_message,
-        "eval_details": eval_det,
-        "created_at": s.created_at.isoformat() if s.created_at else ""
+        "points_earned": s.score,
+        "error_message": None if s.is_correct else "Result set does not match reference query.",
+        "eval_details": test_results,
+        "created_at": s.submitted_at.isoformat() if s.submitted_at else ""
     }
 
 @router.get("/leaderboard")
 def get_leaderboard(db: Session = Depends(get_db)):
-    return {
-        "leaderboard": [
-            {
-                "student_id": 1,
-                "student_name": "Alex Rivera",
-                "total_points": 850,
-                "challenges_solved": 14,
-                "accuracy": 93.3,
-                "streak": 5
-            },
-            {
-                "student_id": 2,
-                "student_name": "Beatriz Silva",
-                "total_points": 720,
-                "challenges_solved": 12,
-                "accuracy": 88.5,
-                "streak": 4
-            },
-            {
-                "student_id": 3,
-                "student_name": "Charles Babbage",
-                "total_points": 640,
-                "challenges_solved": 10,
-                "accuracy": 85.0,
-                "streak": 3
-            },
-            {
-                "student_id": 4,
-                "student_name": "Diana Prince",
-                "total_points": 510,
-                "challenges_solved": 8,
-                "accuracy": 80.0,
-                "streak": 2
-            },
-            {
-                "student_id": 5,
-                "student_name": "Ethan Hunt",
-                "total_points": 420,
-                "challenges_solved": 6,
-                "accuracy": 75.0,
-                "streak": 1
-            }
-        ]
-    }
+    """Fetch real-time rankings of registered students who signed in with their email ID and took a test/submitted a challenge."""
+    students = db.query(User).filter(User.role == "STUDENT").all()
+    if not students:
+        students = db.query(User).filter(User.role != "TRAINER").all()
+
+    leaderboard_data = []
+
+    for s in students:
+        # Fetch actual DBMS submissions for this student
+        subs = db.query(DBMSSubmission).filter(DBMSSubmission.student_id == s.id).all()
+
+        total_attempts = len(subs)
+
+        # STRICT RULE: Only include students who signed in with their email ID and actually took a test/submitted a challenge!
+        if total_attempts == 0:
+            continue
+
+        accepted_subs = [sub for sub in subs if sub.is_correct or sub.score > 0]
+
+        # Calculate distinct solved challenge count & challenge points
+        solved_challenges_map = {}
+        for sub in accepted_subs:
+            solved_challenges_map[sub.challenge_id] = max(
+                solved_challenges_map.get(sub.challenge_id, 0.0),
+                sub.score
+            )
+
+        challenges_solved_count = len(solved_challenges_map)
+        points_from_challenges = sum(solved_challenges_map.values())
+
+        # Competency progress records
+        comps = db.query(DBMSCompetencyProgress).filter(DBMSCompetencyProgress.student_id == s.id).all()
+        points_from_comps = sum(c.score for c in comps) if comps else 0.0
+
+        # Total points calculation
+        total_points = int(points_from_challenges + points_from_comps)
+
+        # Accuracy calculation
+        successful_attempts = len(accepted_subs)
+        accuracy = round((successful_attempts / total_attempts) * 100, 1) if total_attempts > 0 else 100.0
+
+        # Calculate streak from submission dates
+        submission_dates = set()
+        for sub in subs:
+            if sub.submitted_at:
+                submission_dates.add(sub.submitted_at.date())
+
+        streak = max(len(submission_dates), 1)
+
+        leaderboard_data.append({
+            "student_id": s.id,
+            "student_name": s.name,
+            "student_email": s.email,
+            "total_points": total_points,
+            "challenges_solved": challenges_solved_count,
+            "accuracy": accuracy,
+            "streak": streak
+        })
+
+    # Sort leaderboard by total_points DESC, then challenges_solved DESC, then accuracy DESC
+    leaderboard_data.sort(key=lambda x: (x["total_points"], x["challenges_solved"], x["accuracy"]), reverse=True)
+
+    return {"leaderboard": leaderboard_data}
+
+
+

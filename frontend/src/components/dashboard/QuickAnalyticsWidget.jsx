@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ragApi } from '../../services/api';
+import React, { useState, useEffect } from 'react';
+import { ragApi, modulesApi, quizApi } from '../../services/api';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { CheckSquare, Sparkles, Send, Bot, Layers, Award } from 'lucide-react';
@@ -8,6 +8,22 @@ export const QuickAnalyticsWidget = () => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [aiAnswer, setAiAnswer] = useState(null);
+  const [modulesCount, setModulesCount] = useState(5);
+  const [quizzesCount, setQuizzesCount] = useState(5);
+
+  useEffect(() => {
+    Promise.all([
+      modulesApi.getAll().catch(() => null),
+      quizApi.getAll().catch(() => null)
+    ]).then(([modRes, quizRes]) => {
+      if (modRes?.data?.length) {
+        setModulesCount(modRes.data.length);
+      }
+      if (quizRes?.data?.length) {
+        setQuizzesCount(quizRes.data.length);
+      }
+    });
+  }, []);
 
   const handleAskAI = async (e) => {
     e.preventDefault();
@@ -31,8 +47,8 @@ export const QuickAnalyticsWidget = () => {
         <div className="p-5 bg-lms-surface border border-lms-border rounded-2xl flex items-center justify-between shadow-sm">
           <div>
             <p className="text-[11px] font-bold text-lms-taupe uppercase tracking-wider">DBMS Course Modules</p>
-            <p className="text-2xl font-black text-lms-dark mt-1">5 Modules</p>
-            <p className="text-[11px] text-lms-taupe mt-0.5">ER, SQL, Normalization, Indexing, ACID</p>
+            <p className="text-2xl font-black text-lms-dark mt-1">{modulesCount} Modules</p>
+            <p className="text-[11px] text-lms-taupe mt-0.5 font-medium">ER, SQL, Normalization, Indexing, ACID</p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-lms-dark text-lms-sand flex items-center justify-center font-bold">
             <Layers className="w-6 h-6" />
@@ -42,8 +58,8 @@ export const QuickAnalyticsWidget = () => {
         <div className="p-5 bg-lms-surface border border-lms-border rounded-2xl flex items-center justify-between shadow-sm">
           <div>
             <p className="text-[11px] font-bold text-lms-taupe uppercase tracking-wider">Quizzes Assessed</p>
-            <p className="text-2xl font-black text-lms-dark mt-1">5 Quizzes</p>
-            <p className="text-[11px] text-emerald-800 font-medium mt-0.5">Evaluated via Qwen 3.2 AI</p>
+            <p className="text-2xl font-black text-lms-dark mt-1">{quizzesCount} Quizzes</p>
+            <p className="text-[11px] text-emerald-800 font-semibold mt-0.5">Evaluated via Qwen 3.2 AI</p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-lms-sand/30 text-lms-dark flex items-center justify-center font-bold">
             <Award className="w-6 h-6 text-lms-dark" />

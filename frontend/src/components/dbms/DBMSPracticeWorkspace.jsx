@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { dbmsLabApi } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import confetti from 'canvas-confetti';
 import { 
   CheckCircle2, XCircle, Play, Send, Sparkles, Trophy, Clock, 
   HelpCircle, ArrowLeft, BookOpen, Layers, Terminal, Award, 
-  Check, RefreshCw, Filter, ChevronRight 
+  Check, RefreshCw, Filter, ChevronRight, X 
 } from 'lucide-react';
 
 export const DBMSPracticeWorkspace = () => {
   const { challengeId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [challenges, setChallenges] = useState([]);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
@@ -21,6 +24,10 @@ export const DBMSPracticeWorkspace = () => {
   const [userSql, setUserSql] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [evalResult, setEvalResult] = useState(null);
+
+  // Modal & Celebration State
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [countdown, setCountdown] = useState(5);
 
   // AI Mentor Hint State
   const [hintText, setHintText] = useState('');
@@ -36,6 +43,21 @@ export const DBMSPracticeWorkspace = () => {
       fetchSingleChallenge(challengeId);
     }
   }, [challengeId]);
+
+  // Countdown timer for success modal auto-redirect
+  useEffect(() => {
+    let timer;
+    if (showSuccessModal && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (showSuccessModal && countdown === 0) {
+      setShowSuccessModal(false);
+      setSelectedChallenge(null);
+      navigate('/student/dbms-lab/practice');
+    }
+    return () => clearInterval(timer);
+  }, [showSuccessModal, countdown, navigate]);
 
   const fetchChallenges = async () => {
     setLoading(true);
@@ -69,8 +91,23 @@ export const DBMSPracticeWorkspace = () => {
 
     setSubmitting(true);
     try {
-      const res = await dbmsLabApi.evaluateSubmission(selectedChallenge.id, userSql);
+      const res = await dbmsLabApi.evaluateSubmission(selectedChallenge.id, userSql, user?.id || 1);
       setEvalResult(res.data);
+
+      if (res.data?.is_correct || res.data?.status === 'ACCEPTED') {
+        // Fire celebration confetti!
+        try {
+          confetti({
+            particleCount: 120,
+            spread: 80,
+            origin: { y: 0.6 }
+          });
+        } catch (e) {
+          console.error("Confetti trigger error:", e);
+        }
+        setCountdown(5);
+        setShowSuccessModal(true);
+      }
     } catch (err) {
       alert("Submission evaluation failed.");
     } finally {
@@ -100,7 +137,7 @@ export const DBMSPracticeWorkspace = () => {
 
   if (selectedChallenge) {
     return (
-      <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50 text-slate-900 font-sans overflow-hidden">
+      <div className="flex flex-col h-[calc(100vh-4rem)] bg-slate-50 text-slate-900 font-sans overflow-hidden relative">
         
         {/* Workspace Top Header Bar */}
         <div className="h-14 px-4 bg-white border-b border-slate-200 flex items-center justify-between shrink-0 shadow-sm">
@@ -168,10 +205,10 @@ export const DBMSPracticeWorkspace = () => {
             {/* Test Case Overview Checklist */}
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
               <h4 className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Validation Criteria ({selectedChallenge.test_cases?.length || 0} Test Cases)
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Validation Criteria ({(selectedChallenge.test_cases || selectedChallenge.visible_test_cases || []).length} Test Cases)
               </h4>
               <div className="space-y-1.5 text-xs text-slate-700">
-                {selectedChallenge.test_cases?.map((tc, idx) => (
+                {(selectedChallenge.test_cases || selectedChallenge.visible_test_cases || []).map((tc, idx) => (
                   <div key={idx} className="flex items-center gap-2">
                     <span className={`w-2 h-2 rounded-full ${tc.is_hidden ? 'bg-purple-500' : 'bg-emerald-500'}`} />
                     <span className="font-semibold text-slate-900">{tc.name}</span>
@@ -242,16 +279,20 @@ export const DBMSPracticeWorkspace = () => {
 
                   <div className="space-y-2">
                     <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">Visible Test Case Outputs</span>
-                    {evalResult.visible_test_cases?.map((vt, i) => (
-                      <div key={i} className="p-3 bg-white border border-slate-200 rounded-xl space-y-1 text-xs shadow-sm">
-                        <div className="flex items-center justify-between font-bold">
-                          <span className="text-slate-900">{vt.name}</span>
-                          <span className={vt.passed ? 'text-emerald-600' : 'text-rose-600'}>
-                            {vt.passed ? '✓ PASSED' : '✕ FAILED'}
-                          </span>
+                    {evalResult.visible_test_cases?.map((vt, i) => {
+                      const isPassed = vt.passed !== undefined ? vt.passed : (vt.status === 'PASS' || vt.status === 'ACCEPTED');
+                      return (
+                        <div key={i} className="p-3 bg-white border border-slate-200 rounded-xl space-y-1 text-xs shadow-sm">
+                          <div className="flex items-center justify-between font-bold">
+                            <span className="text-slate-900">{vt.name}</span>
+                            <span className={isPassed ? 'text-emerald-600' : 'text-rose-600'}>
+                              {isPassed ? '✓ PASSED' : '✕ FAILED'}
+                            </span>
+                          </div>
+                          {vt.detail && <p className="text-[11px] text-slate-500 font-normal mt-0.5">{vt.detail}</p>}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               ) : (
@@ -263,6 +304,77 @@ export const DBMSPracticeWorkspace = () => {
           </div>
 
         </div>
+
+        {/* Celebration Success Modal */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
+            <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-8 shadow-2xl space-y-6 text-slate-900 relative overflow-hidden">
+              {/* Decorative Background Glow */}
+              <div className="absolute -top-12 -right-12 w-36 h-36 bg-emerald-100 rounded-full blur-2xl pointer-events-none opacity-60" />
+              <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-amber-100 rounded-full blur-2xl pointer-events-none opacity-60" />
+
+              <div className="text-center space-y-3 relative z-10">
+                <div className="w-16 h-16 bg-emerald-100 border-2 border-emerald-300 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-md">
+                  <Trophy className="w-9 h-9" />
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                  🎉 Challenge Passed!
+                </h3>
+                <p className="text-sm text-slate-600 font-medium max-w-sm mx-auto">
+                  Awesome job! Your SQL solution passed all test cases with perfect accuracy.
+                </p>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 gap-3 bg-slate-50 border border-slate-200 p-4 rounded-2xl relative z-10 text-xs">
+                <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-0.5 text-center">
+                  <span className="text-slate-500 font-semibold uppercase text-[10px]">Points Earned</span>
+                  <p className="text-lg font-black text-amber-600">+{evalResult?.points_earned || selectedChallenge?.max_score || 100} pts</p>
+                </div>
+                <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-0.5 text-center">
+                  <span className="text-slate-500 font-semibold uppercase text-[10px]">Execution Time</span>
+                  <p className="text-lg font-black text-slate-800 font-mono">{evalResult?.execution_time_ms ? `${evalResult.execution_time_ms.toFixed(2)} ms` : '0.03 ms'}</p>
+                </div>
+              </div>
+
+              {/* Automatic Redirect Countdown Banner */}
+              <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl space-y-2 text-center relative z-10">
+                <div className="flex items-center justify-center gap-2 text-emerald-800 font-bold text-xs">
+                  <Clock className="w-4 h-4 text-emerald-600 animate-spin" />
+                  <span>Returning to Practice Hub in <strong className="text-sm font-black text-emerald-700">{countdown}</strong> seconds...</span>
+                </div>
+
+                {/* Progress bar */}
+                <div className="w-full bg-emerald-200 h-2 rounded-full overflow-hidden">
+                  <div 
+                    className="bg-emerald-600 h-full transition-all duration-1000 ease-linear"
+                    style={{ width: `${(countdown / 5) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 relative z-10">
+                <button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    setSelectedChallenge(null);
+                    navigate('/student/dbms-lab/practice');
+                  }}
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5"
+                >
+                  Return to Practice Hub Now <ChevronRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="w-full sm:w-auto px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition"
+                >
+                  Review Query
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

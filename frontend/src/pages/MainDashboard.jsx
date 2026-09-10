@@ -155,7 +155,7 @@ export const MainDashboard = () => {
         className="fixed bottom-6 right-6 z-40 bg-[#081F5C] text-white px-5 py-3 rounded-full shadow-2xl hover:bg-[#081F5C]/90 transition-all flex items-center gap-2 border border-[#D0E3FF]/40 hover:scale-105"
       >
         <Bot className="w-5 h-5 text-[#D0E3FF]" />
-        <span className="text-xs font-black">Ask DBMS AI</span>
+        <span className="text-xs font-black">QueryHub AI</span>
         <Sparkles className="w-3.5 h-3.5 text-amber-300" />
       </button>
 

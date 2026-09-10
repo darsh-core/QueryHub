@@ -20,6 +20,22 @@ class LlamaEvaluationService:
         """
         prompt = cls._build_mcq_generation_prompt(module_title, retrieved_chunks, num_questions, difficulty, style)
         
+        # 1. Try Groq API (Free Tier Qwen 2.5 / 3.2 Models) if GROQ_API_KEY is set
+        try:
+            from app.services.groq_service import GroqAIService
+            groq_response = GroqAIService.call_groq_chat(
+                system_prompt="You are QueryHub AI, an expert professor generating MCQs in strict JSON format.",
+                user_prompt=prompt,
+                temperature=0.2,
+                response_format_json=True
+            )
+            if groq_response:
+                parsed = cls._parse_llm_json(groq_response)
+                if parsed and "questions" in parsed and len(parsed["questions"]) > 0:
+                    return parsed["questions"]
+        except Exception as e:
+            print(f"[Groq AI Notice]: {e}")
+
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(

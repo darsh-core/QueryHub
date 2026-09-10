@@ -828,6 +828,22 @@ class DBMSSandbox:
         }
 
     @classmethod
+    def evaluate_challenge_submission(
+        cls, 
+        submitted_query: str, 
+        reference_query: str, 
+        test_cases: List[Dict[str, Any]],
+        db_name: str
+    ) -> Dict[str, Any]:
+        """Evaluate student submission against reference query and test cases."""
+        return cls.evaluate_challenge(
+            student_query=submitted_query,
+            reference_query=reference_query,
+            db_name=db_name,
+            test_cases=test_cases
+        )
+
+    @classmethod
     def evaluate_challenge(
         cls, 
         student_query: str, 
@@ -878,6 +894,7 @@ class DBMSSandbox:
             "test_case_id": 1,
             "name": "Returned Column Schema Matching",
             "status": "PASS" if t1_passed else "FAIL",
+            "passed": t1_passed,
             "detail": f"Expected {len(ref_cols)} columns ({', '.join(ref_cols)}), got {len(student_cols)} columns.",
             "is_hidden": False
         })
@@ -889,6 +906,7 @@ class DBMSSandbox:
             "test_case_id": 2,
             "name": "Dataset Row Count & Value Validation",
             "status": "PASS" if t2_passed else "FAIL",
+            "passed": t2_passed,
             "detail": f"Expected {len(ref_rows)} rows matching reference dataset, got {len(student_rows)} rows.",
             "is_hidden": False
         })
@@ -902,6 +920,7 @@ class DBMSSandbox:
                 "test_case_id": idx,
                 "name": tc.get("name", f"Validation Check {idx}"),
                 "status": "PASS" if tc_pass else "FAIL",
+                "passed": tc_pass,
                 "detail": tc.get("description", "Edge case validation on dataset state."),
                 "is_hidden": tc.get("is_hidden", False)
             })

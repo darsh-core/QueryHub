@@ -4,7 +4,7 @@ from typing import List, Optional
 from datetime import datetime
 from sqlalchemy.orm import Session
 from app.db.database import get_db
-from app.db.models import User, QuizAttempt, Module, Quiz
+from app.db.models import User, QuizAttempt, Module, Quiz, DBMSSubmission
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
