@@ -5,13 +5,14 @@ import { Navbar } from '../components/common/Navbar';
 import { Card } from '../components/common/Card';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
-import { Database, Layers, ArrowRight, Download, BookOpen, Sparkles, CheckCircle2, Clock } from 'lucide-react';
+import { Database, Cpu, Layers, ArrowRight, Download, BookOpen, Sparkles, CheckCircle2, Clock } from 'lucide-react';
 
 import bannerImg from '../assets/banner.jpg';
 
 export const CourseDetailsPage = () => {
   const navigate = useNavigate();
-  const [modules, setModules] = useState([]);
+  const [allModules, setAllModules] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState('DBMS'); // 'DBMS' or 'DSA'
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,14 +25,19 @@ export const CourseDetailsPage = () => {
           unique.push(m);
         }
       }
-      setModules(unique);
+      setAllModules(unique);
       setLoading(false);
     });
   }, []);
 
   const handleDownloadSyllabus = () => {
-    alert("Syllabus PDF downloaded successfully!");
+    alert(`Syllabus PDF for ${selectedCourse} downloaded successfully!`);
   };
+
+  const filteredModules = allModules.filter((m) => {
+    if (selectedCourse === 'DBMS') return m.code.startsWith('DBMS');
+    return m.code.startsWith('DSA');
+  });
 
   return (
     <div className="min-h-screen bg-lms-bg flex flex-col font-sans">
@@ -39,26 +45,61 @@ export const CourseDetailsPage = () => {
 
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
         
+        {/* Course Filter Tabs */}
+        <div className="flex items-center justify-between border-b border-lms-border pb-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSelectedCourse('DBMS')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all ${
+                selectedCourse === 'DBMS'
+                  ? 'bg-lms-dark text-lms-sand shadow-md'
+                  : 'bg-lms-surface text-lms-taupe hover:text-lms-dark border border-lms-border'
+              }`}
+            >
+              <Database className="w-4 h-4" /> DBMS (23IT201)
+            </button>
+
+            <button
+              onClick={() => setSelectedCourse('DSA')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all ${
+                selectedCourse === 'DSA'
+                  ? 'bg-lms-dark text-lms-sand shadow-md'
+                  : 'bg-lms-surface text-lms-taupe hover:text-lms-dark border border-lms-border'
+              }`}
+            >
+              <Cpu className="w-4 h-4" /> Data Structures & Algorithms (23IT202)
+            </button>
+          </div>
+
+          <span className="text-xs font-bold text-lms-taupe hidden sm:inline">
+            Active Course Selection
+          </span>
+        </div>
+
         {/* Course Header Banner */}
         <div 
-          className="relative overflow-hidden text-white rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl border border-lms-sand/30 bg-cover bg-center bg-no-repeat"
+          className="relative overflow-hidden text-white rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl border border-lms-sand/30 bg-cover bg-center bg-no-repeat transition-all duration-300"
           style={{ backgroundImage: `url(${bannerImg})` }}
         >
-          <div className="absolute inset-0 bg-slate-950/60 backdrop-brightness-90"></div>
+          <div className="absolute inset-0 bg-slate-950/65 backdrop-brightness-90"></div>
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-3 max-w-2xl">
               <div className="flex items-center gap-2">
-                <Badge variant="sand">CS-501</Badge>
+                <Badge variant="sand">{selectedCourse === 'DBMS' ? 'CS-501' : 'CS-502'}</Badge>
                 <span className="text-xs text-lms-sand font-bold">Spring Semester</span>
               </div>
               
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight">
-                Database Management Systems (DBMS)
+                {selectedCourse === 'DBMS' 
+                  ? 'Database Management Systems (DBMS)' 
+                  : 'Data Structures & Algorithms (DSA)'}
               </h1>
               
               <p className="text-xs sm:text-sm text-lms-surface/90 leading-relaxed">
-                Comprehensive study of relational database design, SQL querying, functional dependencies, 3NF/BCNF normalization, indexing structures (B+ Trees), transaction isolation, and ACID properties.
+                {selectedCourse === 'DBMS'
+                  ? 'Comprehensive study of relational database design, SQL querying, functional dependencies, 3NF/BCNF normalization, indexing structures (B+ Trees), transaction isolation, and ACID properties.'
+                  : 'Master core computational structures, asymptotic complexity analysis (Big-O), arrays, linked lists, stacks, queues, binary search trees (BST), heaps, sorting, graph traversals, and dynamic programming.'}
               </p>
 
               <div className="flex items-center gap-3 pt-2">
@@ -68,10 +109,10 @@ export const CourseDetailsPage = () => {
                     alt="Dr. Christy Jeba Malar" 
                     className="w-6 h-6 rounded-full border border-lms-sand"
                   />
-                  <span className="font-bold">Dr. Christy Jeba Malar</span>
+                  <span className="font-bold">Prof. Christy (SKCT)</span>
                 </div>
                 <span className="text-lms-sand">•</span>
-                <span className="text-xs text-lms-sand font-semibold">{modules.length || 10} Modules • Qwen 3.2 AI Assessed</span>
+                <span className="text-xs text-lms-sand font-semibold">{filteredModules.length || 10} Modules • Qwen 2.5 AI Assessed</span>
               </div>
             </div>
 
@@ -87,16 +128,16 @@ export const CourseDetailsPage = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-extrabold text-lms-dark tracking-tight flex items-center gap-2">
-              <Layers className="w-5 h-5 text-lms-sand" /> Interactive Course Curriculum ({modules.length || 10} Modules)
+              <Layers className="w-5 h-5 text-lms-sand" /> Interactive Course Curriculum ({filteredModules.length} Modules)
             </h2>
             <span className="text-xs font-semibold text-lms-taupe">Click any module to open workspace</span>
           </div>
 
           {loading ? (
-            <div className="p-12 text-center text-lms-taupe font-medium">Loading DBMS curriculum modules...</div>
+            <div className="p-12 text-center text-lms-taupe font-medium">Loading curriculum modules...</div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
-              {modules.map((mod, idx) => (
+              {filteredModules.map((mod, idx) => (
                 <div
                   key={mod.id}
                   onClick={() => navigate(`/course/dbms/module/${mod.id}`)}

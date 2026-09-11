@@ -4,16 +4,17 @@ import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
 import { VideoPlayer } from './VideoPlayer';
-import { BookOpen, Video, FileText, CheckCircle, Clock } from 'lucide-react';
+import { BookOpen, Video, FileText, CheckCircle, Clock, Database, Cpu, Filter } from 'lucide-react';
 
 export const ModuleBrowser = () => {
-  const [modules, setModules] = useState([]);
+  const [allModules, setAllModules] = useState([]);
+  const [filterCourse, setFilterCourse] = useState('ALL'); // 'ALL', 'DBMS', 'DSA'
   const [loading, setLoading] = useState(true);
   const [selectedLesson, setSelectedLesson] = useState(null);
 
   useEffect(() => {
     modulesApi.getAll().then((res) => {
-      setModules(res.data);
+      setAllModules(res.data);
       if (res.data.length > 0 && res.data[0].lessons?.length > 0) {
         setSelectedLesson(res.data[0].lessons[0]);
       }
@@ -21,11 +22,55 @@ export const ModuleBrowser = () => {
     });
   }, []);
 
+  const filteredModules = allModules.filter((m) => {
+    if (filterCourse === 'DBMS') return m.code.startsWith('DBMS');
+    if (filterCourse === 'DSA') return m.code.startsWith('DSA');
+    return true;
+  });
+
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-brand-dark">Course Modules & Lecture Videos</h2>
-        <p className="text-xs text-brand-secondary">Stream video lectures, review lesson outlines, and track learning progress</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-bold text-brand-dark">Course Modules & Lecture Videos</h2>
+          <p className="text-xs text-brand-secondary">Stream video lectures, review lesson outlines, and track learning progress across DBMS and DSA</p>
+        </div>
+
+        {/* Filter Pills */}
+        <div className="flex items-center gap-2 p-1 bg-brand-surface rounded-xl border border-brand-border shrink-0">
+          <button
+            onClick={() => setFilterCourse('ALL')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              filterCourse === 'ALL'
+                ? 'bg-brand-dark text-brand-sand shadow-xs'
+                : 'text-brand-secondary hover:text-brand-dark'
+            }`}
+          >
+            All Courses
+          </button>
+
+          <button
+            onClick={() => setFilterCourse('DBMS')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              filterCourse === 'DBMS'
+                ? 'bg-brand-dark text-brand-sand shadow-xs'
+                : 'text-brand-secondary hover:text-brand-dark'
+            }`}
+          >
+            <Database className="w-3.5 h-3.5" /> DBMS
+          </button>
+
+          <button
+            onClick={() => setFilterCourse('DSA')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              filterCourse === 'DSA'
+                ? 'bg-brand-dark text-brand-sand shadow-xs'
+                : 'text-brand-secondary hover:text-brand-dark'
+            }`}
+          >
+            <Cpu className="w-3.5 h-3.5" /> Data Structures
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -46,8 +91,8 @@ export const ModuleBrowser = () => {
 
           {/* Module & Lesson Accordion List */}
           <div className="space-y-4">
-            <h3 className="text-sm font-bold text-brand-dark uppercase tracking-wider">Course Syllabus Outline</h3>
-            {modules.map((mod) => (
+            <h3 className="text-sm font-bold text-brand-dark uppercase tracking-wider">Course Syllabus Outline ({filteredModules.length} Modules)</h3>
+            {filteredModules.map((mod) => (
               <Card key={mod.id} className="!p-4">
                 <div className="mb-3">
                   <span className="text-[10px] font-bold text-brand-sand bg-brand-dark px-2 py-0.5 rounded-md">

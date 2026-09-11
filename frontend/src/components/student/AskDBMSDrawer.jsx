@@ -6,13 +6,13 @@ import {
   CheckCircle2, RefreshCw, FileText 
 } from 'lucide-react';
 
-export const AskDBMSDrawer = ({ isOpen, onClose, moduleId = null, moduleTitle = "All DBMS Modules" }) => {
+export const AskDBMSDrawer = ({ isOpen, onClose, moduleId = null, moduleTitle = "All Course Modules" }) => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([
     {
       sender: 'assistant',
-      text: `Hello! I am QueryHub AI, powered by Qwen 2.5 7B RAG. Ask me any question about database architecture, SQL queries, functional dependencies, normalization, transactions, or B+ tree indexing!`,
+      text: `Hello! I am QueryHub AI, powered by Qwen 2.5 7B RAG. Ask me any question about DBMS (SQL, Normalization, B+ Trees, 2PL) or Data Structures (Big-O, BST, Sorting, Graphs, DP)!`,
       citations: []
     }
   ]);
@@ -67,7 +67,7 @@ export const AskDBMSDrawer = ({ isOpen, onClose, moduleId = null, moduleTitle = 
               <h3 className="text-sm font-black text-white flex items-center gap-1.5">
                 QueryHub AI <Sparkles className="w-3.5 h-3.5 text-lms-sand" />
               </h3>
-              <p className="text-[10px] text-lms-sand font-mono">Qwen 2.5 7B • RAG Grounded Citations</p>
+              <p className="text-[10px] text-lms-sand font-mono">Qwen 2.5 7B • RAG Grounded DBMS & DSA</p>
             </div>
           </div>
 
@@ -128,7 +128,7 @@ export const AskDBMSDrawer = ({ isOpen, onClose, moduleId = null, moduleTitle = 
         <form onSubmit={handleAsk} className="p-3 bg-white border-t border-lms-border flex items-center gap-2">
           <input
             type="text"
-            placeholder="Ask QueryHub AI about DBMS architecture, 2PL, normal forms..."
+            placeholder="Ask QueryHub AI about DBMS architecture, BST, QuickSort, DP..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="flex-1 px-3 py-2 text-xs bg-lms-surface border border-lms-border rounded-xl text-lms-dark placeholder-lms-taupe focus:outline-none focus:ring-2 focus:ring-lms-dark font-medium"

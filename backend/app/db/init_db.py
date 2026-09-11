@@ -270,7 +270,246 @@ def init_db():
         }
     ]
 
-    for m_data in dbms_modules_data:
+    # 3. 10 DSA (Data Structures & Algorithms) Course Modules Curriculum
+    dsa_modules_data = [
+        {
+            "code": "DSA-101",
+            "title": "Module 1: Introduction to Data Structures & Complexity",
+            "description": "Abstract Data Types (ADTs), Big-O, Big-Omega, Big-Theta asymptotic notations, time-space trade-offs, and amortized complexity analysis.",
+            "order": 1,
+            "filename": "DSA_Mod1_Intro_Complexity.pdf",
+            "slides": [
+                {"title": "Slide 1: Abstract Data Types & Data Structures", "content": "An ADT specifies what operations can be performed (e.g. Stack, Queue, Map), while a Data Structure is the concrete implementation in memory."},
+                {"title": "Slide 2: Asymptotic Notations (Big-O, Ω, Θ)", "content": "Big-O defines upper bounds (worst-case), Big-Omega defines lower bounds (best-case), and Big-Theta defines tight bound analysis of running time."},
+                {"title": "Slide 3: Space & Time Trade-offs", "content": "Analyzing auxiliary memory usage versus CPU execution cycles. Amortized time complexity averages operation costs over a sequence of operations."}
+            ],
+            "questions": [
+                {
+                    "question": "Which asymptotic notation describes the strict TIGHT BOUND (both upper and lower) execution time of an algorithm?",
+                    "options": ["A) Big-O (O)", "B) Big-Omega (Ω)", "C) Big-Theta (Θ)", "D) Little-o (o)"],
+                    "correct_answer": "C) Big-Theta (Θ)",
+                    "explanation": "Big-Theta (Θ) specifies that a function is bounded both above and below by constant multiples of g(n).",
+                    "difficulty": "easy",
+                    "source_page": 2
+                },
+                {
+                    "question": "What is the amortized time complexity of inserting an element into a dynamic array (like Python list or C++ std::vector)?",
+                    "options": ["A) O(n)", "B) O(1)", "C) O(log n)", "D) O(n^2)"],
+                    "correct_answer": "B) O(1)",
+                    "explanation": "Resizing takes O(n) infrequently when capacity doubles, but averaged over n insertions, each append takes O(1) amortized time.",
+                    "difficulty": "medium",
+                    "source_page": 3
+                }
+            ]
+        },
+        {
+            "code": "DSA-102",
+            "title": "Module 2: Arrays, Dynamic Arrays & Two-Pointers",
+            "description": "Contiguous memory allocation, row/column-major layout, 2D arrays, prefix sums, sliding window, and two-pointer techniques.",
+            "order": 2,
+            "filename": "DSA_Mod2_Arrays_TwoPointers.pdf",
+            "slides": [
+                {"title": "Slide 1: Contiguous Array Memory Allocation", "content": "Elements are stored sequentially in adjacent memory blocks. Element lookup by index takes O(1) time via base address math: Addr = Base + index * element_size."},
+                {"title": "Slide 2: Two-Pointer Technique", "content": "Using left and right pointers moving towards each other or at different speeds to solve array problems (e.g. 2-Sum sorted, palindrome check, container with most water) in O(n)."},
+                {"title": "Slide 3: Sliding Window Pattern", "content": "Maintaining a dynamic window over contiguous sub-arrays to compute maximum sum, longest substring without repeating characters in O(n) time."}
+            ],
+            "questions": [
+                {
+                    "question": "Given a sorted array of integers, which algorithm pattern finds two numbers that sum to a target value in O(n) time and O(1) extra space?",
+                    "options": ["A) Binary Search Tree", "B) Two-Pointer Technique", "C) Merge Sort", "D) Dynamic Programming"],
+                    "correct_answer": "B) Two-Pointer Technique",
+                    "explanation": "With two pointers starting at opposite ends, we increment left if sum < target or decrement right if sum > target in linear O(n) time.",
+                    "difficulty": "easy",
+                    "source_page": 2
+                }
+            ]
+        },
+        {
+            "code": "DSA-103",
+            "title": "Module 3: Linked Lists (Singly, Doubly & Circular)",
+            "description": "Node pointers, dynamic memory allocation, singly linked list operations, doubly linked list traversal, cycle detection (Floyd's Fast & Slow pointer).",
+            "order": 3,
+            "filename": "DSA_Mod3_LinkedLists.pdf",
+            "slides": [
+                {"title": "Slide 1: Singly Linked Lists", "content": "Non-contiguous memory allocation where each node contains data and a pointer to the next node. Insertion/Deletion at head takes O(1) time."},
+                {"title": "Slide 2: Doubly & Circular Linked Lists", "content": "Doubly linked lists contain both next and prev pointers enabling bidirectional traversal. Circular lists link tail node back to head node."},
+                {"title": "Slide 3: Floyd's Cycle Detection Algorithm", "content": "Uses two pointers moving at different speeds (Slow = 1 step, Fast = 2 steps). If a loop exists, fast and slow pointers will inevitably meet inside the cycle."}
+            ],
+            "questions": [
+                {
+                    "question": "What is the time complexity of detecting a cycle in a Singly Linked List using Floyd's Tortoise and Hare (Fast & Slow pointers) algorithm?",
+                    "options": ["A) O(1)", "B) O(log n)", "C) O(n)", "D) O(n^2)"],
+                    "correct_answer": "C) O(n)",
+                    "explanation": "Floyd's algorithm traverses the list in O(n) time using O(1) additional memory space.",
+                    "difficulty": "medium",
+                    "source_page": 3
+                }
+            ]
+        },
+        {
+            "code": "DSA-104",
+            "title": "Module 4: Stacks, Queues & Deques",
+            "description": "LIFO vs FIFO ordering principles, array & linked list implementations, expression evaluation (Infix, Prefix, Postfix), and Monotonic Stacks.",
+            "order": 4,
+            "filename": "DSA_Mod4_Stacks_Queues.pdf",
+            "slides": [
+                {"title": "Slide 1: Stack Architecture (LIFO)", "content": "Last-In, First-Out data structure. Primary operations: Push(x) O(1), Pop() O(1), Peek() O(1). Used in call stacks, undo mechanisms, and parenthetical matching."},
+                {"title": "Slide 2: Queue Architecture (FIFO)", "content": "First-In, First-Out data structure. Enqueue(x) adds to rear, Dequeue() removes from front. Circular queues solve array boundary drift."},
+                {"title": "Slide 3: Expression Parsing & Monotonic Stack", "content": "Converting Infix to Postfix (Reverse Polish Notation) using Shunting Yard algorithm. Monotonic stacks solve Next Greater Element problems in O(n)."}
+            ],
+            "questions": [
+                {
+                    "question": "Which data structure follows the Last-In, First-Out (LIFO) access principle?",
+                    "options": ["A) Queue", "B) Stack", "C) Priority Queue", "D) Circular Buffer"],
+                    "correct_answer": "B) Stack",
+                    "explanation": "Stacks strictly operate on LIFO principle where the last pushed element is the first to be popped.",
+                    "difficulty": "easy",
+                    "source_page": 1
+                }
+            ]
+        },
+        {
+            "code": "DSA-105",
+            "title": "Module 5: Trees & Binary Search Trees (BST)",
+            "description": "Tree terminology, binary trees, Depth-First Traversals (Inorder, Preorder, Postorder), Breadth-First (Level-order), BST operations, and Lowest Common Ancestor (LCA).",
+            "order": 5,
+            "filename": "DSA_Mod5_Trees_BST.pdf",
+            "slides": [
+                {"title": "Slide 1: Binary Tree Properties", "content": "Hierarchical structure where each node has at most two children (left and right). Maximum nodes at depth d = 2^d. Inorder traversal of BST yields sorted keys."},
+                {"title": "Slide 2: Binary Search Tree (BST) Invariant", "content": "For every node X, all keys in X's left subtree are strictly smaller than X.key, and all keys in X's right subtree are strictly greater."},
+                {"title": "Slide 3: Tree Traversals & Balancing", "content": "DFS: Inorder (Left, Root, Right), Preorder (Root, Left, Right), Postorder (Left, Right, Root). BFS uses Queue. Balanced trees (AVL/Red-Black) guarantee O(log n) operations."}
+            ],
+            "questions": [
+                {
+                    "question": "Which tree traversal order produces sorted elements when applied to a valid Binary Search Tree (BST)?",
+                    "options": ["A) Preorder Traversal", "B) Inorder Traversal", "C) Postorder Traversal", "D) Level-order Traversal"],
+                    "correct_answer": "B) Inorder Traversal",
+                    "explanation": "Inorder traversal visits Left Subtree -> Root -> Right Subtree, retrieving BST keys in non-decreasing sorted order.",
+                    "difficulty": "easy",
+                    "source_page": 3
+                }
+            ]
+        },
+        {
+            "code": "DSA-106",
+            "title": "Module 6: Heaps & Priority Queues",
+            "description": "Binary Heap complete tree property, Min-Heap vs Max-Heap invariants, array representation, Heapify O(n), and Heap Sort.",
+            "order": 6,
+            "filename": "DSA_Mod6_Heaps_PriorityQueues.pdf",
+            "slides": [
+                {"title": "Slide 1: Binary Heap Property", "content": "A complete binary tree stored in contiguous array. Min-Heap: parent <= children. Max-Heap: parent >= children. Node i children at indices 2i+1 and 2i+2."},
+                {"title": "Slide 2: Heap Operations", "content": "Insert(x): append and sift-up O(log n). ExtractMin/Max: swap root with last, pop, sift-down O(log n). Peek O(1)."},
+                {"title": "Slide 3: Heapify & Heap Sort", "content": "Build-Heap (Heapify) constructs a heap from an unsorted array in linear O(n) time. Heap Sort achieves O(n log n) sorting with O(1) extra space."}
+            ],
+            "questions": [
+                {
+                    "question": "What is the time complexity of building a heap from an unsorted array of n elements using the bottom-up Heapify algorithm?",
+                    "options": ["A) O(n log n)", "B) O(n)", "C) O(log n)", "D) O(n^2)"],
+                    "correct_answer": "B) O(n)",
+                    "explanation": "Bottom-up Heapify computes sum of heights h/2^h, converging geometrically to O(n) total operations.",
+                    "difficulty": "hard",
+                    "source_page": 3
+                }
+            ]
+        },
+        {
+            "code": "DSA-107",
+            "title": "Module 7: Hash Tables & Hashing Techniques",
+            "description": "Hash functions, load factor α = n/m, collision resolution strategies (Separate Chaining, Open Addressing - Linear/Quadratic Probing, Double Hashing).",
+            "order": 7,
+            "filename": "DSA_Mod7_Hashing.pdf",
+            "slides": [
+                {"title": "Slide 1: Hash Function & Buckets", "content": "Hash function h(k) maps arbitrary keys to fixed integer index range [0..m-1]. Good hash functions distribute keys uniformly to minimize collisions."},
+                {"title": "Slide 2: Separate Chaining vs Open Addressing", "content": "Chaining handles collisions by keeping linked lists per bucket. Open Addressing searches next available slot using probing sequences."},
+                {"title": "Slide 3: Load Factor & Dynamic Resizing", "content": "Load factor α = n/m. When α exceeds threshold (e.g. 0.75), table capacity m doubles and all keys are rehashed to maintain O(1) average lookup."}
+            ],
+            "questions": [
+                {
+                    "question": "In Hash Tables with Open Addressing, what phenomenon occurs when consecutive occupied slots form long contiguous blocks, increasing search times?",
+                    "options": ["A) Secondary Clustering", "B) Primary Clustering", "C) Hash Overflows", "D) Chain Thrashing"],
+                    "correct_answer": "B) Primary Clustering",
+                    "explanation": "Linear probing creates long contiguous runs of occupied slots (primary clustering), degrading search performance.",
+                    "difficulty": "medium",
+                    "source_page": 2
+                }
+            ]
+        },
+        {
+            "code": "DSA-108",
+            "title": "Module 8: Searching & Sorting Algorithms",
+            "description": "Comparison-based sorting (Bubble, Insertion, Selection, QuickSort, MergeSort), Non-comparison sorting (Count/Radix), and Binary Search variants.",
+            "order": 8,
+            "filename": "DSA_Mod8_Searching_Sorting.pdf",
+            "slides": [
+                {"title": "Slide 1: Binary Search & Variants", "content": "Efficiently searches sorted arrays in O(log n) time by halving search range each step. Computes lower bound, upper bound, and exact match."},
+                {"title": "Slide 2: Divide & Conquer Sorting (Quick & Merge)", "content": "Merge Sort: guarantees O(n log n) stable sorting using O(n) auxiliary space. QuickSort: in-place average O(n log n) using Lomuto/Hoare partition."},
+                {"title": "Slide 3: Sorting Lower Bounds", "content": "Decision tree model proves any comparison-based sorting algorithm requires at least Ω(n log n) comparison operations in worst case."}
+            ],
+            "questions": [
+                {
+                    "question": "Which sorting algorithm guarantees O(n log n) worst-case time complexity while maintaining STABLE relative order of equal elements?",
+                    "options": ["A) Quick Sort", "B) Heap Sort", "C) Merge Sort", "D) Selection Sort"],
+                    "correct_answer": "C) Merge Sort",
+                    "explanation": "Merge Sort consistently divides arrays into halves and merges in O(n log n) time while remaining stable.",
+                    "difficulty": "easy",
+                    "source_page": 2
+                }
+            ]
+        },
+        {
+            "code": "DSA-109",
+            "title": "Module 9: Graph Algorithms (BFS, DFS & Shortest Path)",
+            "description": "Graph representations (Adjacency Matrix vs List), Breadth-First Search (BFS), Depth-First Search (DFS), Topological Sort, Dijkstra's Shortest Path, and Minimum Spanning Trees (Kruskal/Prim).",
+            "order": 9,
+            "filename": "DSA_Mod9_Graph_Algorithms.pdf",
+            "slides": [
+                {"title": "Slide 1: Graph Representations & Traversals", "content": "Adjacency matrix O(V^2) vs Adjacency list O(V+E). BFS uses Queue to explore level-by-level (unweighted shortest path). DFS uses Stack/Recursion."},
+                {"title": "Slide 2: Topological Sorting & Cycle Detection", "content": "Ordering DAG (Directed Acyclic Graph) vertices such that for edge u->v, u appears before v. Kahn's In-Degree algorithm or DFS post-order traversal."},
+                {"title": "Slide 3: Shortest Path & MST (Dijkstra, Kruskal, Prim)", "content": "Dijkstra finds single-source shortest path in non-negative weighted graphs in O((V+E) log V). Kruskal/Prim build Minimum Spanning Trees."}
+            ],
+            "questions": [
+                {
+                    "question": "What is the time complexity of Dijkstra's algorithm for finding single-source shortest path using a Min-Heap priority queue on graph G=(V, E)?",
+                    "options": ["A) O(V^2)", "B) O((V + E) log V)", "C) O(V * E)", "D) O(E^2)"],
+                    "correct_answer": "B) O((V + E) log V)",
+                    "explanation": "Min-Heap priority queue allows extracting minimum distance vertex in O(log V) and updating E edges in O(E log V) time.",
+                    "difficulty": "medium",
+                    "source_page": 3
+                }
+            ]
+        },
+        {
+            "code": "DSA-110",
+            "title": "Module 10: Dynamic Programming & Greedy Paradigm",
+            "description": "Overlapping subproblems and optimal substructure, Memoization (top-down) vs Tabulation (bottom-up), 0/1 Knapsack, Longest Common Subsequence (LCS), and Greedy Choice Property.",
+            "order": 10,
+            "filename": "DSA_Mod10_Dynamic_Programming.pdf",
+            "slides": [
+                {"title": "Slide 1: Core Principles of Dynamic Programming", "content": "DP breaks complex problems into smaller subproblems, caching intermediate solutions to avoid exponential recalculations. Requires Optimal Substructure and Overlapping Subproblems."},
+                {"title": "Slide 2: Top-Down Memoization vs Bottom-Up Tabulation", "content": "Memoization recursively solves subproblems saving outputs in a hash table or array. Tabulation iteratively fills an n-dimensional table from base cases up."},
+                {"title": "Slide 3: Classic DP Problems (Knapsack, LCS, LIS)", "content": "0/1 Knapsack O(N*W), Longest Common Subsequence O(M*N), Coin Change, and Longest Increasing Subsequence O(N log N)."}
+            ],
+            "questions": [
+                {
+                    "question": "What two key conditions MUST a optimization problem satisfy for Dynamic Programming to be successfully applied?",
+                    "options": [
+                        "A) Greedy Choice Property & Disjoint Subproblems",
+                        "B) Optimal Substructure & Overlapping Subproblems",
+                        "C) Linear Searchable State & Sortable Keys",
+                        "D) Monotonicity & Strictly Increasing Functions"
+                    ],
+                    "correct_answer": "B) Optimal Substructure & Overlapping Subproblems",
+                    "explanation": "Optimal Substructure allows constructing optimal solutions from optimal subproblems; Overlapping Subproblems ensures subproblems repeat.",
+                    "difficulty": "medium",
+                    "source_page": 1
+                }
+            ]
+        }
+    ]
+
+    all_modules_data = dbms_modules_data + dsa_modules_data
+
+    for m_data in all_modules_data:
         mod = db.query(Module).filter(Module.code == m_data["code"]).first()
         if not mod:
             mod = Module(
@@ -283,7 +522,65 @@ def init_db():
             db.commit()
             db.refresh(mod)
 
-        pass
+        # 4. Create or Update Material
+        mat = db.query(Material).filter(Material.module_id == mod.id).first()
+        if not mat:
+            mat = Material(
+                module_id=mod.id,
+                title=f"{m_data['title']} Reference Deck",
+                file_type="PDF",
+                file_path=m_data["filename"],
+                slides_json=json.dumps(m_data["slides"])
+            )
+            db.add(mat)
+            db.commit()
+            db.refresh(mat)
+
+        # 5. Create Lessons & DocumentChunks for slide decks
+        for idx, slide in enumerate(m_data["slides"]):
+            les = db.query(Lesson).filter(Lesson.module_id == mod.id, Lesson.title == slide["title"]).first()
+            if not les:
+                les = Lesson(
+                    module_id=mod.id,
+                    title=slide["title"],
+                    content_type="DOCUMENT",
+                    duration="10m",
+                    order=idx + 1,
+                    video_url=None
+                )
+                db.add(les)
+
+            chunk = db.query(DocumentChunk).filter(DocumentChunk.material_id == mat.id, DocumentChunk.page_number == idx + 1).first()
+            if not chunk:
+                chunk = DocumentChunk(
+                    material_id=mat.id,
+                    chunk_text=f"{slide['title']}\n{slide['content']}",
+                    page_number=idx + 1
+                )
+                db.add(chunk)
+
+        # 6. Create AIQuestions
+        for q_data in m_data.get("questions", []):
+            existing_q = db.query(AIQuestion).filter(
+                AIQuestion.module_id == mod.id,
+                AIQuestion.question_text == q_data["question"]
+            ).first()
+            if not existing_q:
+                q_obj = AIQuestion(
+                    module_id=mod.id,
+                    material_id=mat.id,
+                    question_text=q_data["question"],
+                    options_json=json.dumps(q_data["options"]),
+                    correct_answer=q_data["correct_answer"],
+                    explanation=q_data["explanation"],
+                    difficulty=q_data["difficulty"],
+                    source_document=m_data["filename"],
+                    source_page=q_data.get("source_page", 1),
+                    status="PUBLISHED"
+                )
+                db.add(q_obj)
+
+        db.commit()
 
     # 6. Seed DBMS Virtual Lab Pre-built Databases
     from app.services.dbms_sandbox import DBMSSandbox
