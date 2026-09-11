@@ -123,8 +123,8 @@ export const CourseDetailsPage = () => {
                   />
                   <span className="font-bold">Prof. Christy (SKCT)</span>
                 </div>
-                <span className="text-lms-sand">•</span>
-                <span className="text-xs text-lms-sand font-semibold">{filteredModules.length || 10} Modules • Qwen 2.5 AI Assessed</span>
+                <span className="text-[#F1F6F9]">•</span>
+                <span className="text-xs text-[#F1F6F9] font-semibold">{filteredModules.length} Modules • Qwen 2.5 AI Assessed</span>
               </div>
             </div>
 
@@ -147,12 +147,28 @@ export const CourseDetailsPage = () => {
 
           {loading ? (
             <div className="p-12 text-center text-lms-taupe font-medium">Loading curriculum modules...</div>
+          ) : filteredModules.length === 0 ? (
+            <div className="bg-lms-surface border border-lms-border rounded-2xl p-12 text-center space-y-3">
+              <BookOpen className="w-12 h-12 text-lms-taupe mx-auto opacity-50" />
+              <h3 className="text-base font-bold text-lms-dark">No modules uploaded yet for {selectedCourse}</h3>
+              <p className="text-xs text-lms-taupe max-w-md mx-auto">
+                All mock modules have been removed. Upload course slide decks via the Trainer Portal or switch to DBMS to view active course curriculum.
+              </p>
+              <div className="pt-2 flex justify-center gap-3">
+                <Button variant="outline" size="sm" onClick={() => setSelectedCourse('DBMS')}>
+                  Switch to DBMS (CS-501)
+                </Button>
+                <Button variant="primary" size="sm" onClick={() => navigate('/visualizers')}>
+                  Open DSA Visualizer Suite
+                </Button>
+              </div>
+            </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {filteredModules.map((mod, idx) => (
                 <div
                   key={mod.id}
-                  onClick={() => navigate(`/course/dbms/module/${mod.id}`)}
+                  onClick={() => navigate(`/course/module/${mod.id}`)}
                   className="bg-lms-surface border border-lms-border rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-lms-taupe transition-all duration-200 cursor-pointer group flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
                   <div className="flex items-start gap-4">

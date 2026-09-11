@@ -26,7 +26,7 @@ export const FeaturedCourseCard = () => {
       desc: "Master computational data structures, Big-O asymptotic analysis, dynamic arrays, linked lists, stacks, queues, binary search trees (BST), heaps, sorting, and graph algorithms.",
       instructor: "Prof. Christy (SKCT)",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
-      modulesCount: 10,
+      modulesCount: 0,
       icon: Cpu,
       path: "/course/dsa"
     }
