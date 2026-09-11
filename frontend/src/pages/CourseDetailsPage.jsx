@@ -168,7 +168,7 @@ export const CourseDetailsPage = () => {
               {filteredModules.map((mod, idx) => (
                 <div
                   key={mod.id}
-                  onClick={() => navigate(`/course/module/${mod.id}`)}
+                  onClick={() => navigate(`/course/${selectedCourse.toLowerCase()}/module/${mod.id}`)}
                   className="bg-lms-surface border border-lms-border rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-lms-taupe transition-all duration-200 cursor-pointer group flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
                   <div className="flex items-start gap-4">

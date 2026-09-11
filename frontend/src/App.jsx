@@ -77,6 +77,11 @@ export default function App() {
           } />
 
           {/* Module Detail Workspace */}
+          <Route path="/course/module/:moduleId" element={
+            <ProtectedRoute>
+              <ModuleWorkspacePage />
+            </ProtectedRoute>
+          } />
           <Route path="/course/dbms/module/:moduleId" element={
             <ProtectedRoute>
               <ModuleWorkspacePage />
