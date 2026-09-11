@@ -59,8 +59,18 @@ export default function App() {
             </ProtectedRoute>
           } />
 
-          {/* DBMS Course Details Page */}
+          {/* Course Details Pages (DBMS & DSA) */}
           <Route path="/course/dbms" element={
+            <ProtectedRoute>
+              <CourseDetailsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/course/dsa" element={
+            <ProtectedRoute>
+              <CourseDetailsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/course/:courseId" element={
             <ProtectedRoute>
               <CourseDetailsPage />
             </ProtectedRoute>
@@ -68,6 +78,11 @@ export default function App() {
 
           {/* Module Detail Workspace */}
           <Route path="/course/dbms/module/:moduleId" element={
+            <ProtectedRoute>
+              <ModuleWorkspacePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/course/:courseId/module/:moduleId" element={
             <ProtectedRoute>
               <ModuleWorkspacePage />
             </ProtectedRoute>

@@ -23,6 +23,10 @@ export const ModuleWorkspacePage = () => {
     });
   }, [moduleId]);
 
+  const isDsa = moduleData?.code?.startsWith('DSA');
+  const backPath = isDsa ? '/course/dsa' : '/course/dbms';
+  const backLabel = isDsa ? 'Back to DSA Course Modules' : 'Back to DBMS Course Modules';
+
   return (
     <div className="min-h-screen bg-lms-bg flex flex-col font-sans">
       <Navbar />
@@ -32,10 +36,10 @@ export const ModuleWorkspacePage = () => {
         {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between">
           <button 
-            onClick={() => navigate('/course/dbms')}
+            onClick={() => navigate(backPath)}
             className="inline-flex items-center gap-1.5 text-xs font-bold text-lms-taupe hover:text-lms-dark transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" /> Back to DBMS Course Modules
+            <ChevronLeft className="w-4 h-4" /> {backLabel}
           </button>
 
           <span className="text-xs font-mono font-bold text-lms-dark bg-lms-surface px-2.5 py-1 rounded-lg border border-lms-border">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { modulesApi } from '../services/api';
 import { Navbar } from '../components/common/Navbar';
 import { Card } from '../components/common/Card';
@@ -11,9 +11,21 @@ import bannerImg from '../assets/banner.jpg';
 
 export const CourseDetailsPage = () => {
   const navigate = useNavigate();
+  const { courseId } = useParams();
+  const location = useLocation();
+
+  const isDsaPath = (courseId && courseId.toLowerCase() === 'dsa') || location.pathname.includes('/course/dsa');
   const [allModules, setAllModules] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState('DBMS'); // 'DBMS' or 'DSA'
+  const [selectedCourse, setSelectedCourse] = useState(isDsaPath ? 'DSA' : 'DBMS');
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (courseId) {
+      setSelectedCourse(courseId.toLowerCase() === 'dsa' ? 'DSA' : 'DBMS');
+    } else if (location.pathname.includes('/course/dsa')) {
+      setSelectedCourse('DSA');
+    }
+  }, [courseId, location.pathname]);
 
   useEffect(() => {
     modulesApi.getAll().then((res) => {

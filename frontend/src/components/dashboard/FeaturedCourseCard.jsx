@@ -28,7 +28,7 @@ export const FeaturedCourseCard = () => {
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
       modulesCount: 10,
       icon: Cpu,
-      path: "/course/dbms"
+      path: "/course/dsa"
     }
   ];
 
