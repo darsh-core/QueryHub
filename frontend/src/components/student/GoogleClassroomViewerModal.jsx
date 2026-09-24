@@ -486,7 +486,7 @@ export const GoogleClassroomViewerModal = ({
                 <div className="bg-[#081F5C] text-white px-6 py-3 font-bold text-xs uppercase tracking-wider flex items-center justify-between shadow-sm">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-[#E5B54F]" />
-                    <span>23IT201 • DATABASE MANAGEMENT SYSTEMS</span>
+                    <span>{moduleTitle ? moduleTitle.toUpperCase() : "COURSE LECTURE MODULE"}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] text-white/80 font-mono uppercase">{moduleTitle}</span>

@@ -14,7 +14,7 @@ def build_file_url(file_path_or_name: str) -> str:
     """Build URL-safe static file URL without double-encoding."""
     base_name = os.path.basename(file_path_or_name)
     raw_name = unquote(base_name)
-    base_url = os.getenv("BACKEND_URL", "https://queryhub-qge3.onrender.com").rstrip("/")
+    base_url = os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
     return f"{base_url}/uploads/{quote(raw_name)}"
 
 def enrich_slides_with_images(slides: list, file_path: str) -> list:
@@ -26,7 +26,7 @@ def enrich_slides_with_images(slides: list, file_path: str) -> list:
     base_no_ext = os.path.splitext(filename)[0]
     slides_dir_name = f"slides_{base_no_ext}"
     slides_dir = os.path.join(settings.UPLOAD_DIR, slides_dir_name)
-    base_url = os.getenv("BACKEND_URL", "https://queryhub-qge3.onrender.com").rstrip("/")
+    base_url = os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
     
     if os.path.exists(slides_dir):
         image_files = sorted(glob.glob(os.path.join(slides_dir, "slide-*.png")))

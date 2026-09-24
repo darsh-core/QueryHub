@@ -1,7 +1,12 @@
 import axios from 'axios';
 
 let rawApiUrl = import.meta.env.VITE_API_URL || '';
-if (!rawApiUrl || rawApiUrl.includes('queryhub-backend.onrender.com') || rawApiUrl.includes('your-queryhub')) {
+const isLocalhost = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+if (isLocalhost) {
+  rawApiUrl = 'http://localhost:8000/api';
+} else if (!rawApiUrl || rawApiUrl.includes('queryhub-backend.onrender.com') || rawApiUrl.includes('your-queryhub')) {
   rawApiUrl = 'https://queryhub-qge3.onrender.com/api';
 }
 const API_BASE_URL = rawApiUrl.replace(/\/+$/, '');
@@ -10,12 +15,14 @@ export const BACKEND_ROOT_URL = API_BASE_URL.replace(/\/api\/?$/, '');
 export const resolveBackendUrl = (pathOrUrl) => {
   if (!pathOrUrl) return '';
   if (typeof pathOrUrl !== 'string') return pathOrUrl;
-  if (pathOrUrl.startsWith('http://localhost:8000')) {
-    return pathOrUrl.replace('http://localhost:8000', BACKEND_ROOT_URL);
+
+  if (pathOrUrl.includes('/uploads/')) {
+    const uploadIdx = pathOrUrl.indexOf('/uploads/');
+    const relativePath = pathOrUrl.substring(uploadIdx);
+    return `${BACKEND_ROOT_URL}${relativePath}`;
   }
-  if (pathOrUrl.startsWith('/uploads/') || pathOrUrl.startsWith('uploads/')) {
-    const cleanPath = pathOrUrl.startsWith('/') ? pathOrUrl : `/${pathOrUrl}`;
-    return `${BACKEND_ROOT_URL}${cleanPath}`;
+  if (pathOrUrl.startsWith('uploads/')) {
+    return `${BACKEND_ROOT_URL}/${pathOrUrl}`;
   }
   return pathOrUrl;
 };

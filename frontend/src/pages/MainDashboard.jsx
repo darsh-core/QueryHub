@@ -62,7 +62,7 @@ export const MainDashboard = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-[#081F5C] tracking-tight flex items-center gap-2">
               <Database className="w-4 h-4 text-[#081F5C]" />
-              DBMS Virtual Lab Quick Access
+              Interactive Virtual Labs & Learning Tools
             </h2>
             <button
               onClick={() => navigate('/student/dbms-lab')}

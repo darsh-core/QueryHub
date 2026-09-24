@@ -154,7 +154,7 @@ class RAGService:
 
         # 2. Extract high-res PNG images for every slide
         slide_image_urls = []
-        base_url = os.getenv("BACKEND_URL", "https://queryhub-qge3.onrender.com").rstrip("/")
+        base_url = os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
         if os.path.exists(pdf_path):
             try:
                 os.makedirs(slides_dir, exist_ok=True)
@@ -189,7 +189,7 @@ class RAGService:
         os.makedirs(slides_dir, exist_ok=True)
 
         slide_image_urls = []
-        base_url = os.getenv("BACKEND_URL", "https://queryhub-qge3.onrender.com").rstrip("/")
+        base_url = os.getenv("BACKEND_URL", "http://localhost:8000").rstrip("/")
         try:
             pdftoppm_bin = "/opt/homebrew/bin/pdftoppm" if os.path.exists("/opt/homebrew/bin/pdftoppm") else "pdftoppm"
             subprocess.run([pdftoppm_bin, "-png", "-r", "150", pdf_path, os.path.join(slides_dir, "slide")], capture_output=True, timeout=60)

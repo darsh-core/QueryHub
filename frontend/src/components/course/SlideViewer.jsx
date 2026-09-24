@@ -10,11 +10,13 @@ export const SlideViewer = ({ moduleData }) => {
     if (moduleData?.id) {
       setLoading(true);
       ragApi.getModuleDocs(moduleData.id).then((res) => {
-        setDocuments(res.data);
+        setDocuments(res.data || []);
+        setLoading(false);
+      }).catch(() => {
         setLoading(false);
       });
     }
-  }, [moduleData]);
+  }, [moduleData?.id]);
 
   const materials = documents.map(d => {
     const isPPT = d.file_type === 'PPT' || d.title?.toLowerCase().endsWith('.pptx') || d.title?.toLowerCase().endsWith('.ppt');
@@ -29,10 +31,11 @@ export const SlideViewer = ({ moduleData }) => {
       fileType: isPPT ? "Google Slides" : "PDF",
       rawFileType: isPPT ? "PPT" : "PDF",
       fileUrl: d.file_url,
+      pdfUrl: d.pdf_url,
       slides: d.slides || [],
       pagesCount: d.pages_count || (d.slides?.length || 1),
       slidePreviewTitle: d.slides?.[0]?.title || moduleData?.title || displayTitle,
-      slideSub: moduleData?.code ? `${moduleData.code} • Database Management Systems` : "23IT201 • DBMS"
+      slideSub: moduleData?.code ? `${moduleData.code} • ${moduleData.code.startsWith('DSA') ? 'Data Structures & Algorithms' : 'Database Management Systems'}` : "Course Module"
     };
   });
 

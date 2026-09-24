@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, Terminal, Trophy, Cpu } from 'lucide-react';
+import { Sparkles, Terminal, Trophy, Cpu, PlayCircle } from 'lucide-react';
 import img1 from '../../assets/img1.png';
 
 export const HeroBanner = () => {
@@ -14,15 +14,15 @@ export const HeroBanner = () => {
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-2.5 max-w-2xl">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#D0E3FF]/20 border border-[#D0E3FF]/30 text-[#D0E3FF] rounded-full text-[11px] font-bold uppercase tracking-wider">
-            <Cpu className="w-3 h-3" /> Qwen 2.5 Powered • DBMS Virtual Lab
+            <Cpu className="w-3 h-3" /> Qwen 2.5 Powered • DBMS & DSA AI Labs
           </div>
 
           <h1 className="text-xl sm:text-2xl font-black tracking-tight leading-snug text-white">
-            DBMS Learning Portal & SQL Virtual Lab
+            DBMS & Data Structures AI Learning Portal
           </h1>
 
           <p className="text-xs text-[#D0E3FF]/90 font-normal leading-relaxed">
-            Master relational database architecture, write & test SQL queries in real time, visualize ER schemas, and solve practice challenges with instant AI feedback.
+            Master relational database architecture, data structures & algorithms, write & test SQL queries in real time, explore interactive visualizers, and solve practice challenges with instant AI feedback.
           </p>
 
           <div className="flex flex-wrap items-center gap-2.5 pt-1">
@@ -33,6 +33,13 @@ export const HeroBanner = () => {
               <Terminal className="w-3.5 h-3.5 text-[#081F5C]" /> Launch SQL Virtual Lab
             </button>
             
+            <button 
+              onClick={() => navigate('/visualizers')}
+              className="flex items-center gap-2 px-3.5 py-2 bg-white/10 hover:bg-white/20 border border-[#D0E3FF]/30 text-white font-semibold rounded-lg transition text-xs"
+            >
+              <PlayCircle className="w-3.5 h-3.5 text-sky-300" /> DSA Visualizer Suite
+            </button>
+
             <button 
               onClick={() => navigate('/student/dbms-lab/practice')}
               className="flex items-center gap-2 px-3.5 py-2 bg-white/10 hover:bg-white/20 border border-[#D0E3FF]/30 text-white font-semibold rounded-lg transition text-xs"

@@ -20,6 +20,9 @@ export const TrainerDashboard = () => {
   const [reviewQueue, setReviewQueue] = useState([]);
   const [loading, setLoading] = useState(true);
   const [timeFilter, setTimeFilter] = useState('all'); // all | 7d | 30d
+  const [courseFilter, setCourseFilter] = useState('ALL'); // ALL | DBMS | DSA
+  const [uploadCourseFilter, setUploadCourseFilter] = useState('ALL'); // ALL | DBMS | DSA
+  const [genCourseFilter, setGenCourseFilter] = useState('ALL'); // ALL | DBMS | DSA
 
   // File Upload State
   const [uploadModuleId, setUploadModuleId] = useState('');
@@ -298,9 +301,50 @@ export const TrainerDashboard = () => {
           })}
         </div>
 
-        <div className="hidden lg:flex items-center gap-2 text-xs text-gray-500 font-medium pr-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span className="text-[11px]">System Status: <span className="font-semibold text-gray-700">Operational</span></span>
+        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg border border-gray-200 shrink-0">
+          <span className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider px-1">Course:</span>
+          <button
+            onClick={() => setCourseFilter('ALL')}
+            className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all ${
+              courseFilter === 'ALL' ? 'bg-[#081F5C] text-white shadow-xs' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            All ({modules.length})
+          </button>
+          <button
+            onClick={() => {
+              setCourseFilter('DBMS');
+              setUploadCourseFilter('DBMS');
+              setGenCourseFilter('DBMS');
+              const firstDbms = modules.find(m => m.code.startsWith('DBMS'));
+              if (firstDbms) {
+                setUploadModuleId(firstDbms.id.toString());
+                setGenModuleId(firstDbms.id.toString());
+              }
+            }}
+            className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all ${
+              courseFilter === 'DBMS' ? 'bg-[#081F5C] text-white shadow-xs' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            DBMS (CS-501)
+          </button>
+          <button
+            onClick={() => {
+              setCourseFilter('DSA');
+              setUploadCourseFilter('DSA');
+              setGenCourseFilter('DSA');
+              const firstDsa = modules.find(m => m.code.startsWith('DSA'));
+              if (firstDsa) {
+                setUploadModuleId(firstDsa.id.toString());
+                setGenModuleId(firstDsa.id.toString());
+              }
+            }}
+            className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all ${
+              courseFilter === 'DSA' ? 'bg-[#081F5C] text-white shadow-xs' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Data Structures (CS-502)
+          </button>
         </div>
       </div>
 
@@ -715,17 +759,81 @@ export const TrainerDashboard = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                <div className="flex items-center gap-1 text-xs text-gray-600">
-                  <span className="font-medium text-[11px]">Topic:</span>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                <div className="flex flex-wrap items-center gap-1.5 text-xs text-gray-600">
+                  <span className="font-medium text-[11px]">Course:</span>
+                  <div className="flex items-center gap-1 bg-gray-200/70 p-0.5 rounded-lg">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUploadCourseFilter('ALL');
+                      }}
+                      className={`px-2 py-0.5 text-[11px] font-bold rounded-md transition-all ${
+                        uploadCourseFilter === 'ALL' 
+                          ? 'bg-[#081F5C] text-white shadow-xs' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      All
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUploadCourseFilter('DBMS');
+                        const first = modules.find(m => m.code.startsWith('DBMS'));
+                        if (first) setUploadModuleId(first.id.toString());
+                      }}
+                      className={`px-2 py-0.5 text-[11px] font-bold rounded-md transition-all ${
+                        uploadCourseFilter === 'DBMS' 
+                          ? 'bg-[#081F5C] text-white shadow-xs' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      DBMS
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUploadCourseFilter('DSA');
+                        const first = modules.find(m => m.code.startsWith('DSA'));
+                        if (first) setUploadModuleId(first.id.toString());
+                      }}
+                      className={`px-2 py-0.5 text-[11px] font-bold rounded-md transition-all ${
+                        uploadCourseFilter === 'DSA' 
+                          ? 'bg-[#081F5C] text-white shadow-xs' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      DSA
+                    </button>
+                  </div>
+
+                  <span className="font-medium text-[11px] ml-1">Module:</span>
                   <select
                     value={uploadModuleId}
                     onChange={(e) => setUploadModuleId(e.target.value)}
                     className="px-2.5 py-1 text-xs bg-white border border-gray-300 rounded-md text-gray-900 font-semibold focus:outline-none focus:border-[#081F5C]"
                   >
-                    {modules.map(m => (
-                      <option key={m.id} value={m.id}>{m.code}: {m.title}</option>
-                    ))}
+                    {uploadCourseFilter === 'ALL' ? (
+                      <>
+                        <optgroup label="DBMS Modules (CS-501)">
+                          {modules.filter(m => m.code.startsWith('DBMS')).map(m => (
+                            <option key={m.id} value={m.id}>{m.code}: {m.title}</option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="Data Structures Modules (CS-502)">
+                          {modules.filter(m => m.code.startsWith('DSA')).map(m => (
+                            <option key={m.id} value={m.id}>{m.code}: {m.title}</option>
+                          ))}
+                        </optgroup>
+                      </>
+                    ) : (
+                      modules
+                        .filter(m => m.code.startsWith(uploadCourseFilter))
+                        .map(m => (
+                          <option key={m.id} value={m.id}>{m.code}: {m.title}</option>
+                        ))
+                    )}
                   </select>
                 </div>
 
@@ -972,15 +1080,47 @@ export const TrainerDashboard = () => {
           <form onSubmit={handleGenerateAIQuiz} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Target Module</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-gray-700">Target Module</label>
+                  <div className="flex items-center gap-0.5 bg-gray-100 p-0.5 rounded border border-gray-200">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setGenCourseFilter('DBMS');
+                        const first = modules.find(m => m.code.startsWith('DBMS'));
+                        if (first) setGenModuleId(first.id.toString());
+                      }}
+                      className={`px-1.5 py-0.2 text-[10px] font-bold rounded ${
+                        genCourseFilter === 'DBMS' ? 'bg-[#081F5C] text-white' : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      DBMS
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setGenCourseFilter('DSA');
+                        const first = modules.find(m => m.code.startsWith('DSA'));
+                        if (first) setGenModuleId(first.id.toString());
+                      }}
+                      className={`px-1.5 py-0.2 text-[10px] font-bold rounded ${
+                        genCourseFilter === 'DSA' ? 'bg-[#081F5C] text-white' : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      DSA
+                    </button>
+                  </div>
+                </div>
                 <select
                   value={genModuleId}
                   onChange={(e) => setGenModuleId(e.target.value)}
                   className="w-full px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-lg text-gray-900 font-medium focus:outline-none focus:border-[#081F5C]"
                 >
-                  {modules.map(m => (
-                    <option key={m.id} value={m.id}>{m.code}: {m.title}</option>
-                  ))}
+                  {modules
+                    .filter(m => genCourseFilter === 'ALL' || m.code.startsWith(genCourseFilter))
+                    .map(m => (
+                      <option key={m.id} value={m.id}>{m.code}: {m.title}</option>
+                    ))}
                 </select>
               </div>
 

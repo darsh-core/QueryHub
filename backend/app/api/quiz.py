@@ -208,8 +208,10 @@ async def generate_ai_questions(req: GenerateAIQuizRequest, db: Session = Depend
             })
             
     if not chunks_list:
+        is_dsa = "dsa" in module.code.lower() or "dsa" in module.title.lower() or "data structure" in module.title.lower()
+        topic_desc = "Covers linear and non-linear data structures, asymptotic algorithm complexity, trees, graphs, and dynamic programming." if is_dsa else "Covers relational database architecture, SQL, indexing, transactions, and normal forms."
         chunks_list.append({
-            "text": f"Lecture material for {module.title}. Covers relational concepts, indexing, transactions, and SQL.",
+            "text": f"Lecture material for {module.title}. {topic_desc}",
             "document": f"{module.code}_Syllabus.pdf",
             "page": 1
         })
